@@ -1,0 +1,40 @@
+package com.wenxt.base.sample.drools
+
+import com.wenxt.base.sample.drools.DetailsModel;
+rule "Eligible to Vote"
+salience 2
+	when 
+		details: DetailsModel(age >= 18)
+	then
+		System.out.println("Eligible to Vote");
+		details.setMessage("Eligible to Vote");
+	end
+rule "Not Eligible to Vote"
+	when
+		details: DetailsModel(age > 100 || age < 18)
+	then 
+	 	System.out.println("Not Eligible to Vote");
+		details.setMessage("Not eligible to Vote. He/She is " + (Math.abs(18 - details.getAge())) + " years younger or older than the eligibility");
+	end
+rule "Enter Correct Value"
+	when
+		details: DetailsModel(age == 0)
+	then
+		details.setMessage("Please enter Correct age");
+	end
+rule "Saliences Testing"
+salience 2
+	when 
+		details: DetailsModel(age >= 18)
+	then
+		System.out.println("Salience Testing");
+		details.setMessage("Salience Works");
+	end
+rule "Saliences TestingTwo"
+salience 1
+	when 
+		details: DetailsModel(age >= 18)
+	then
+		System.out.println("Salience TestingTwo");
+		details.setMessage("Salience WorksTwo");
+	end

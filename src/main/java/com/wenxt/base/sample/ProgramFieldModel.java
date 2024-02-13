@@ -177,7 +177,7 @@ public class ProgramFieldModel {
 	
 //	private List<CodeDescModel> options;
 	
-	private String values;
+//	private String values;
 	
 	private String tableName;
 	
@@ -607,13 +607,13 @@ public class ProgramFieldModel {
 //		this.options = options;
 //	}
 
-	public String getValues() {
-		return values;
-	}
-
-	public void setValues(String values) {
-		this.values = values;
-	}
+//	public String getValues() {
+//		return values;
+//	}
+//
+//	public void setValues(String values) {
+//		this.values = values;
+//	}
 
 	public String getTableName() {
 		return tableName;

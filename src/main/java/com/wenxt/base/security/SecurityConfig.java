@@ -45,6 +45,8 @@ public class SecurityConfig {
 				.and()
 				.authorizeHttpRequests().requestMatchers("/records/**").authenticated() 
 				.and() 
+				.authorizeHttpRequests().requestMatchers("/drools/**").authenticated() 
+				.and() 
 				.sessionManagement() 
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS) 
 				.and() 
