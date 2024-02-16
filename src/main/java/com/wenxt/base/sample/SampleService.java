@@ -9,12 +9,12 @@ public interface SampleService {
 	
 	public String insertOrUpdate(InsertRequestModel insertRequest);
 	
-	public void save(ProgramFieldModel field);
+	public void save(ProgramFieldsModel field);
 	
-	public Optional<ProgramFieldModel> get(Integer id);
+	public Optional<ProgramFieldsModel> get(Integer id);
 	
-	public void update(ProgramFieldModel field);
+	public void update(ProgramFieldsModel field);
 	
-	public List<ProgramFieldModel> getList(String programCode);
+	public List<ProgramFieldsModel> getList(String programCode);
 
 }

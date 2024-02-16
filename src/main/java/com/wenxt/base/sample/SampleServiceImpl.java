@@ -34,20 +34,20 @@ public class SampleServiceImpl implements SampleService{
 		return "SUCCESS";
 	}
 
-	public void save(ProgramFieldModel field) {
+	public void save(ProgramFieldsModel field) {
 		// TODO Auto-generated method stub
 		repo.save(field);
 	}
 	
-	public Optional<ProgramFieldModel> get(Integer id) {
-		Optional<ProgramFieldModel> model = repo.findById(id);
+	public Optional<ProgramFieldsModel> get(Integer id) {
+		Optional<ProgramFieldsModel> model = repo.findById(id);
 		return model;
 	}
 	
 	@Transactional
 	@Modifying
-	public void update(ProgramFieldModel field) {
-		Optional<ProgramFieldModel> existingModel = repo.findById(field.getSysId());
+	public void update(ProgramFieldsModel field) {
+		Optional<ProgramFieldsModel> existingModel = repo.findById(field.getSysId());
 		 existingModel.ifPresent(model -> {
 	            model.setDataType("N");
 	            model.setPfd_fld_name(field.getFieldName());
@@ -56,7 +56,7 @@ public class SampleServiceImpl implements SampleService{
 	        });
 	}
 	
-	public List<ProgramFieldModel> getList(String programCode){
+	public List<ProgramFieldsModel> getList(String programCode){
 		return repo.findByProgramCode(programCode);
 	}
 

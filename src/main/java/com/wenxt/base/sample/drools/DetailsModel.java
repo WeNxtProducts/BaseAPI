@@ -1,12 +1,14 @@
 package com.wenxt.base.sample.drools;
 
+import java.util.List;
+
 public class DetailsModel {
 	
 	private String userName;
 	
 	private int age;
 	
-	private String message;
+	private List<String> message;
 
 	public String getUserName() {
 		return userName;
@@ -24,13 +26,14 @@ public class DetailsModel {
 		this.age = age;
 	}
 
-	public String getMessage() {
+	public List<String> getMessage() {
 		return message;
 	}
 
-	public void setMessage(String message) {
+	public void setMessage(List<String> message) {
 		this.message = message;
 	}
+
 
 
 

@@ -15,7 +15,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "LM_PROG_FIELD_DEFN")
-public class ProgramFieldModel {
+public class ProgramFieldsModel {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

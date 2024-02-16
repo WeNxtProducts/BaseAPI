@@ -8,7 +8,7 @@ public class InsertRequestModel {
 	
 	private Integer recordId;
 	
-	private List<ProgramFieldModel> records;
+	private List<ProgramFieldsModel> records;
 
 	public Character getInsertFlag() {
 		return insertFlag;
@@ -26,11 +26,11 @@ public class InsertRequestModel {
 		this.recordId = recordId;
 	}
 
-	public List<ProgramFieldModel> getRecords() {
+	public List<ProgramFieldsModel> getRecords() {
 		return records;
 	}
 
-	public void setRecords(List<ProgramFieldModel> records) {
+	public void setRecords(List<ProgramFieldsModel> records) {
 		this.records = records;
 	}
 

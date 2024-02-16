@@ -15,7 +15,7 @@
 	<description>Base project</description>
 	<properties>
 		<java.version>17</java.version>
-				<drools-version>8.40.0</drools-version>
+		<drools-version>8.40.0</drools-version>
 
 	</properties>
 	<dependencies>
@@ -66,35 +66,50 @@
             <artifactId>jjwt-jackson</artifactId> 
             <version>0.11.5</version> 
         </dependency>	
+        
+        <!--**** Drools Dependencies ****-->
         <dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>drools-mvel</artifactId>
 			<version>8.40.0.Final</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.kie</groupId>
 			<artifactId>kie-api</artifactId>
 			<version>8.40.0.Final</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>drools-core</artifactId>
 			<version>8.40.0.Final</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>drools-compiler</artifactId>
 			<version>8.40.0.Final</version>
 		</dependency>
-		
 		<dependency>
 		<groupId>org.drools</groupId>
 			<artifactId>drools-decisiontables</artifactId>
 			<version>8.40.0.Final</version>
 		</dependency>	
+		<!--**** Drools Dependencies ****-->
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20210307</version>
+		</dependency>
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-test</artifactId>
+</dependency>
+
 	</dependencies>
 
 	<build>

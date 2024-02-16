@@ -5,13 +5,13 @@ import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
 
-public interface SampleRepository extends CrudRepository<ProgramFieldModel, Integer>{
+public interface SampleRepository extends CrudRepository<ProgramFieldsModel, Integer>{
 	
-	ProgramFieldModel save(ProgramFieldModel field);
+	ProgramFieldsModel save(ProgramFieldsModel field);
 	
-	Optional<ProgramFieldModel> findById(Integer id);
+	Optional<ProgramFieldsModel> findById(Integer id);
 	
-	List<ProgramFieldModel> findByProgramCode(String programCode);
+	List<ProgramFieldsModel> findByProgramCode(String programCode);
 	
 
 }

@@ -28,25 +28,25 @@ public class SampleController {
 	
 	 //JPA SAVE Method
 	 @PostMapping("/sampSave")
-	 public void saveRepo(@RequestBody ProgramFieldModel field) {
+	 public void saveRepo(@RequestBody ProgramFieldsModel field) {
 		 sampleService.save(field);
 	 }
 	 
 	 //JPA GET Method
 	 @GetMapping("/sampGet")
-	 public Optional<ProgramFieldModel> sampGet(@RequestParam Integer sysId) {
+	 public Optional<ProgramFieldsModel> sampGet(@RequestParam Integer sysId) {
 		return sampleService.get(sysId);
 	 }
 	 
 	 //JPA UPDATE Method
 	 @PostMapping("/sampUpdate")
-	 public void sampUpdate(@RequestBody ProgramFieldModel field) {
+	 public void sampUpdate(@RequestBody ProgramFieldsModel field) {
 		 sampleService.update(field);
 	 }
 	 
 	 //JPA LIST Method
 	 @GetMapping("/sampListGet")
-	 public List<ProgramFieldModel> sampListGet(@RequestParam String programCode) {
+	 public List<ProgramFieldsModel> sampListGet(@RequestParam String programCode) {
 		 return sampleService.getList(programCode);
 	 }
 
