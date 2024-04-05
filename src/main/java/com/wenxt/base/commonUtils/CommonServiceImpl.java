@@ -73,7 +73,7 @@ public class CommonServiceImpl implements CommonService {
 
 	@Value("${get.audit.log}")
 	private String getAuditMessage;
-	
+
 	@Value("${get.audit.empty}")
 	private String getEmptyAuditMessage;
 
@@ -85,7 +85,7 @@ public class CommonServiceImpl implements CommonService {
 
 	@Value("${get.exception.empty}")
 	private String getExceptionEmptyMessage;
-	
+
 	@Value("${spring.lov.worngid}")
 	private String getLovWrongId;
 
@@ -125,11 +125,11 @@ public class CommonServiceImpl implements CommonService {
 		JSONObject response = new JSONObject();
 		List<APP_AUDIT> list = auditRepo.findBy_AAD_User_IdAnd_AAD_Screen_Name(auditModel.getAAD_User_Id(),
 				auditModel.getAAD_Screen_Name());
-		if(list.size() > 0) {
-		response.put(statusCode, successCode);
-		response.put(messageCode, getAuditMessage);
-		response.put(dataCode, list);
-		}else {
+		if (list.size() > 0) {
+			response.put(statusCode, successCode);
+			response.put(messageCode, getAuditMessage);
+			response.put(dataCode, list);
+		} else {
 			response.put(statusCode, successCode);
 			response.put(messageCode, getEmptyAuditMessage);
 		}
@@ -233,7 +233,10 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public String getQueryLOV(HttpServletRequest request) {
 		Map<String, Object> params = processParamLOV(null, request);
-		/* Getting query Id From the query string in a variable and removing it from params map */
+		/*
+		 * Getting query Id From the query string in a variable and removing it from
+		 * params map
+		 */
 		int queryId = Integer.parseInt(((String) params.get("queryId")));
 		params.remove("queryId");
 		JSONObject response = new JSONObject();
@@ -244,7 +247,10 @@ public class CommonServiceImpl implements CommonService {
 				response.put(statusCode, successCode);
 				response.put(dataCode, queryResult);
 			} else if (query.getQM_QUERY_TYPE().equals("paramlov")) {
-				/* getting parameters for the query if it is of type paramlov and processing it to a map*/
+				/*
+				 * getting parameters for the query if it is of type paramlov and processing it
+				 * to a map
+				 */
 				List<QUERY_PARAM_MASTER> queryParams = commonDao.getQueryParams(query.getQM_SYS_ID());
 				Map<String, Object> paramsMap = processParamLOV(queryParams, request);
 				paramsMap.remove("queryId");
@@ -332,10 +338,12 @@ public class CommonServiceImpl implements CommonService {
 			Map<String, Object> firstRow = queryResult.get(0);
 			Set<String> columnNames = firstRow.keySet();
 			JSONObject heading = new JSONObject();
-			for (String columnName : columnNames) {
-				if (!columnName.equalsIgnoreCase("Head")) {
-					heading.put(columnName, columnName);
-				}
+			String headString = (String) firstRow.get("Head");
+
+			String[] headingNames = headString.split(",");
+
+			for (String headingName : headingNames) {
+				heading.put(headingName.trim(), headingName.trim());
 			}
 			queryResult.get(0).remove("Head");
 
@@ -383,7 +391,7 @@ public class CommonServiceImpl implements CommonService {
 												&& item.getPFD_DATA_TYPE().equals("searchlov")) {
 									QUERY_MASTER query = commonDao.getQueryLov(Integer.parseInt(item.getPFD_PARAM_1()));
 									List<LOVDTO> list = commonDao.executeLOVQuery(query.getQM_QUERY(), null);
-									item.setOptions(list); // Example: set value1 if condition is true
+									item.setOptions(list);
 								} else if (item.getPFD_DATA_TYPE() != null
 										&& item.getPFD_DATA_TYPE().equals("paramlov")) {
 									QUERY_MASTER query = commonDao.getQueryLov(Integer.parseInt(item.getPFD_PARAM_1()));
@@ -534,18 +542,15 @@ public class CommonServiceImpl implements CommonService {
 		List<QUERY_PARAM_MASTER> queryParams = commonDao.getQueryParams(query.getQM_SYS_ID());
 		Map<String, Object> parameters = new HashMap<>();
 
+		Map<String, Object> parameterss = processParamLOV(null, request);
 		for (QUERY_PARAM_MASTER params : queryParams) {
 			if (params.getQPM_PARAM_TYPE().equals("S")) {
 				parameters.put(params.getQPM_PARAM_NAME(), params.getQPM_PARAM_VALUE());
 			} else if (params.getQPM_PARAM_TYPE().equals("P")) {
-				String queryString = request.getQueryString();
-				if (queryString != null) {
-					for (String keyValue : queryString.split("&")) {
-						String[] parts = keyValue.split("=");
-						if (parts.length == 2) {
-							parameters.put(parts[0], parts[1]);
-						}
-					}
+				if (parameterss.get(params.getQPM_PARAM_NAME()) != null) {
+					parameters.put(params.getQPM_PARAM_NAME(), parameterss.get(params.getQPM_PARAM_NAME()));
+				} else {
+					parameters.put(params.getQPM_PARAM_NAME(), null);
 				}
 			}
 		}
@@ -553,10 +558,12 @@ public class CommonServiceImpl implements CommonService {
 		Map<String, Object> firstRow = queryResult.get(0);
 		Set<String> columnNames = firstRow.keySet();
 		JSONObject heading = new JSONObject();
-		for (String columnName : columnNames) {
-			if (!columnName.equalsIgnoreCase("Head")) {
-				heading.put(columnName, columnName);
-			}
+		String headString = (String) firstRow.get("Head");
+
+		String[] headingNames = headString.split(",");
+
+		for (String headingName : headingNames) {
+			heading.put(headingName.trim(), headingName.trim());
 		}
 		queryResult.get(0).remove("Head");
 
@@ -569,34 +576,68 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	public void saveFieldDefJson(HttpServletRequest request) {
-        String filePath = "D:\\newFile.txt";
+		String filePath = "D:\\newFile.txt";
 
-        File file = new File(filePath);
-        file.getParentFile().mkdirs();
+		File file = new File(filePath);
+		file.getParentFile().mkdirs();
 
-        try {
-            FileWriter fileWriter = new FileWriter(file);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            
-    		RestTemplate restTemplate = new RestTemplate();
-    		String url = "http://localhost:8098/common/getfield?screenCode=USERMASTER&screenName=USERCREATE&mucd_user_id=ADMIN";
-    		ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
-    		if (responseEntity.getStatusCode() == HttpStatus.OK) {
-    			String serviceResponse = responseEntity.getBody();
-                bufferedWriter.write(serviceResponse);
-    		} else {
-    			throw new UsernameNotFoundException("JUST CHECK");
-    		}
+		try {
+			FileWriter fileWriter = new FileWriter(file);
+			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
-            bufferedWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+			RestTemplate restTemplate = new RestTemplate();
+			String url = "http://localhost:8098/common/getfield?screenCode=USERMASTER&screenName=USERCREATE&mucd_user_id=ADMIN";
+			ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
+			if (responseEntity.getStatusCode() == HttpStatus.OK) {
+				String serviceResponse = responseEntity.getBody();
+				bufferedWriter.write(serviceResponse);
+			} else {
+				throw new UsernameNotFoundException("JUST CHECK");
+			}
+
+			bufferedWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void serviceToJson(HttpServletRequest request) {
 		AsyncDTO input = new AsyncDTO();
+
+		Map<String, Object> params = processParamLOV(null, request);
+		input.setScreenCode((String) params.get("screenCode"));
+		input.setScreenName((String) params.get("screenName"));
+		input.setServiceName((String) params.get("serviceName"));
+
+		System.out.println(params.get("screenCode") + "*" + params.get("screenName") + "*" + params.get("serviceName"));
+
+		service_url_mapping object = commonDao.getUrlData(input);
+
+		String filePath = object.getserv_response() + object.getserv_screen_name() + "_" + object.getserv_type()
+				+ ".json";
+
+		File file = new File(filePath);
+		file.getParentFile().mkdirs();
+
+		try {
+			FileWriter fileWriter = new FileWriter(file);
+			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+			RestTemplate restTemplate = new RestTemplate();
+			String url = getBaseURL + object.getserv_url() + "?" + request.getQueryString()
+					+ "&screenCode=USERMASTER&screenName=USERCREATE";
+			ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
+			if (responseEntity.getStatusCode() == HttpStatus.OK) {
+				String serviceResponse = responseEntity.getBody();
+				bufferedWriter.write(serviceResponse);
+			} else {
+				throw new UsernameNotFoundException("JUST CHECK");
+			}
+
+			bufferedWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

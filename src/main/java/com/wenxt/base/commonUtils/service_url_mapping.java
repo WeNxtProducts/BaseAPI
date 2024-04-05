@@ -156,4 +156,26 @@ public class service_url_mapping
 		this._serv_mod_id = value;
 	}
 
+	@Column(name = "serv_request")
+	private String _serv_request;
+	public String getserv_request()
+	{
+		return this._serv_request;
+	}
+	public void setserv_request(String value)
+	{
+		this._serv_request = value;
+	}
+
+	@Column(name = "serv_response")
+	private String _serv_response;
+	public String getserv_response()
+	{
+		return this._serv_response;
+	}
+	public void setserv_response(String value)
+	{
+		this._serv_response = value;
+	}
+	
 }
