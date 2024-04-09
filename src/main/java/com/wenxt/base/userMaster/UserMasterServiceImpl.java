@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
+import org.jasypt.encryption.StringEncryptor;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ public class UserMasterServiceImpl implements UserMasterService{
 	
 	@Autowired
 	private UserMasterRepository userrepo;
+	
+	@Autowired
+	private StringEncryptor encryptor;
 	
 	@Value("${get.user.list}")
 	private String getallList;
@@ -41,19 +45,21 @@ public class UserMasterServiceImpl implements UserMasterService{
 	public String createUser(LM_MENU_USERS lM_MENU_USER) {
 		JSONObject response = new JSONObject();
 		JSONObject data = new JSONObject();
-		Optional<LM_MENU_USERS> optionalUser = userrepo.findById(lM_MENU_USER.getUser_id());
+		Optional<LM_MENU_USERS> optionalUser = userrepo.findById(lM_MENU_USER.getUserId());
 
 		if (optionalUser.isPresent()) {
 
 			LM_MENU_USERS existingUser = optionalUser.get();
-
+			
 			userrepo.save(existingUser);
 			return "User information updated successfully";
 		} else {
+			lM_MENU_USER.setUser_passwd(encryptor.encrypt(lM_MENU_USER.getUser_passwd())); 
 			LM_MENU_USERS user = userrepo.save(lM_MENU_USER);
+			
 			response.put("Status", "SUCCESS");
 			response.put("Message", createUser);
-			data.put("Id", user.getUser_id());
+			data.put("Id", user.getUserId());
 			response.put("Data", data);
 			return response.toString();
 		}

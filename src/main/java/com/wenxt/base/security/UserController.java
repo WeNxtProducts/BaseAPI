@@ -13,31 +13,28 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 public class UserController {
-	
-	@Autowired
-	private UserInfoService service; 
-	
+
 	@Autowired
 	private JwtService jwtService;
-	
+
 	@Autowired
-	private AuthenticationManager authenticationManager; 
-	
-	@PostMapping("/addNewUser") 
-	public String addNewUser(@RequestBody UserInfo userInfo) { 
-		return service.addUser(userInfo); 
-	} 
-	
+	private AuthenticationManager authenticationManager;
+
+//	@PostMapping("/addNewUser") 
+//	public String addNewUser(@RequestBody UserInfo userInfo) { 
+//		return service.addUser(userInfo); 
+//	} 
+//	
 	@PostMapping("/generateToken")
-	public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) { 
-	    Authentication authenticationToken =
-	            new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword());
-		Authentication authentication = authenticationManager.authenticate(authenticationToken); 
-		if (authentication.isAuthenticated()) { 
-			return jwtService.generateToken(authRequest); 
-		} else { 
-			throw new UsernameNotFoundException("invalid user request !"); 
-		} 
-	} 
+	public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+		Authentication authenticationToken = new UsernamePasswordAuthenticationToken(authRequest.getUsername(),
+				authRequest.getPassword());
+		Authentication authentication = authenticationManager.authenticate(authenticationToken);
+		if (authentication.isAuthenticated()) {
+			return jwtService.generateToken(authRequest);
+		} else {
+			throw new UsernameNotFoundException("invalid user request !");
+		}
+	}
 
 }

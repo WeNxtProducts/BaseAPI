@@ -1,6 +1,7 @@
 package com.wenxt.base.userMaster;
 
 import jakarta.annotation.Nullable;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -10,7 +11,10 @@ import jakarta.persistence.Table;
 public class LM_MENU_USERS {
 	
 	@Id
-	private String	user_id;
+	@Column(name="user_id")
+	private String	userId;
+	
+//	private String	user_id;
 	private String	user_passwd;
 	private String	user_desc;
 	@Nullable
@@ -61,8 +65,8 @@ public class LM_MENU_USERS {
 	private String	user_comp_code;
 	@Nullable
 	private String	user_administrator_yn;
-	@Nullable
-	private String	user_email_id;
+	@Column(name="user_email_id")
+	private String	userEmailId;
 	@Nullable
 	private String	user_mobile_no;
 	@Nullable
@@ -81,8 +85,8 @@ public class LM_MENU_USERS {
 	private String	user_expiry_dt;
 	@Nullable
 	private String	user_warning_days;
-	@Nullable
-	private String	user_first_login_yn;
+	@Column(name="user_first_login_yn")
+	private Boolean userFirstLoginyn;
 	@Nullable
 	private String	user_frz_flag;
 	@Nullable
@@ -142,13 +146,23 @@ public class LM_MENU_USERS {
 	@Nullable
 	private String	user_signature;
 	
+	@Column(name="user_reset_token")
+	private String userResettoken;
 	
 	
-	public String getUser_id() {
-		return user_id;
+	
+	
+	public String getUserResettoken() {
+		return userResettoken;
 	}
-	public void setUser_id(String user_id) {
-		this.user_id = user_id;
+	public void setUserResettoken(String userResettoken) {
+		this.userResettoken = userResettoken;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 	public String getUser_passwd() {
 		return user_passwd;
@@ -306,14 +320,21 @@ public class LM_MENU_USERS {
 	public void setUser_administrator_yn(String user_administrator_yn) {
 		this.user_administrator_yn = user_administrator_yn;
 	}
-	public String getUser_email_id() {
-		return user_email_id;
-	}
-	public void setUser_email_id(String user_email_id) {
-		this.user_email_id = user_email_id;
-	}
+//	public String getUser_email_id() {
+//		return user_email_id;
+//	}
+//	public void setUser_email_id(String user_email_id) {
+//		this.user_email_id = user_email_id;
+//	}
+	
 	public String getUser_mobile_no() {
 		return user_mobile_no;
+	}
+	public String getUserEmailId() {
+		return userEmailId;
+	}
+	public void setUserEmailId(String userEmailId) {
+		this.userEmailId = userEmailId;
 	}
 	public void setUser_mobile_no(String user_mobile_no) {
 		this.user_mobile_no = user_mobile_no;
@@ -366,11 +387,14 @@ public class LM_MENU_USERS {
 	public void setUser_warning_days(String user_warning_days) {
 		this.user_warning_days = user_warning_days;
 	}
-	public String getUser_first_login_yn() {
-		return user_first_login_yn;
+	
+	
+	
+	public Boolean getUserFirstLoginyn() {
+		return userFirstLoginyn;
 	}
-	public void setUser_first_login_yn(String user_first_login_yn) {
-		this.user_first_login_yn = user_first_login_yn;
+	public void setUserFirstLoginyn(Boolean userFirstLoginyn) {
+		this.userFirstLoginyn = userFirstLoginyn;
 	}
 	public String getUser_frz_flag() {
 		return user_frz_flag;

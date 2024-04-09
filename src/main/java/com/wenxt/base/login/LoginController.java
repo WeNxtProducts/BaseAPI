@@ -1,66 +1,99 @@
 package com.wenxt.base.login;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wenxt.base.security.AuthRequest;
+import com.wenxt.base.security.JwtService;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/auth")
 public class LoginController {
-	
+
 	@Autowired
 	private LoginService loginService;
-	
+
+	@Autowired
+	private InvalidatedTokenRepository invalidatedTokenRepository;
+
+	@Autowired
+	private JwtService jwtService;
+
+	@Autowired
+	private AuthenticationManager authenticationManager;
+
 	@PostMapping("/login")
 	public String login(@RequestBody LoginRequestModel login) {
 		return loginService.login(login);
 	}
-	
+
 	@PostMapping("/getCompList")
 	public String getCompany(@RequestBody LoginDropDownRequestModel user) {
 		return loginService.getCompany(user);
 	}
-	
+
 	@PostMapping("/getBranchList")
 	public String getBranch(@RequestBody LoginDropDownRequestModel user) {
 		return loginService.getBranch(user);
 	}
-	
+
 	@PostMapping("/getDept")
 	public String getDept(@RequestBody LoginDropDownRequestModel user) {
 		return loginService.getDept(user);
 	}
-	
+
 	@PostMapping("/getLang")
 	public String getLang() {
 		return loginService.getLang();
 	}
-	
-	@PostMapping("/reset")
-    public String resetPassword(@RequestParam String name,
-                                @RequestParam String password,
-                                @RequestParam String newPassword,
-                                @RequestParam String confirmPassword) {
-        return loginService.resetPassword(name, password, newPassword, confirmPassword);
-    }
 
-	@PostMapping("/forgot-password")
-	public String forgotPassword(@RequestParam String email) throws Exception {
-			return loginService.processForgotPassword(email);
+	@PostMapping("/profile-reset")
+	public String resetProfilePassword(@RequestParam String password, @RequestParam String newPassword,
+			@RequestParam String confirmPassword) {
+		return loginService.resetProfilePassword(password, newPassword, confirmPassword);
 	}
 
-	@PostMapping("/reset-password")
-	public String resetPassword(@RequestParam String token, @RequestParam String newPassword) {
-		try {
-			loginService.resetPassword(token, newPassword);
-			return "Password reset successful";
-		} catch (InvalidTokenException e) {
-			return "Invalid token";
+	@PostMapping("/forgot-password")
+	public ResponseEntity<String> resetPassword(@RequestParam String email) {
+		return loginService.processForgotPassword(email);
+	}
+
+	@PostMapping("/resetpassword")
+	public ResponseEntity<String> resetPassword(@RequestParam String token, @RequestParam String newPassword,
+			@RequestParam String confirmPassword) throws InvalidTokenException {
+		return loginService.resetPassword(token, newPassword, confirmPassword);
+	}
+
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout(HttpServletRequest request) {
+
+		String token = jwtService.extractTokenFromHeader(request);
+		JSONObject response = new JSONObject();
+
+		if (token != null) {
+			invalidatedTokenRepository.save(new InvalidatedToken(token, null));
+			// Construct JSON response for success
+			response.put("Status", "SUCCESS");
+			response.put("status_msg", "Logout successful");
+			return ResponseEntity.ok().body(response.toString());
+		} else {
+			// Construct JSON response for failure (token not provided)
+			response.put("Status", "FAILURE");
+			response.put("status_msg", "No token provided");
+			return ResponseEntity.badRequest().body(response.toString());
 		}
 	}
 

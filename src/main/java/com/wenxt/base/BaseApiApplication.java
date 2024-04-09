@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 @PropertySource("classpath:Properties/usermaster_msgs.properties")
 @PropertySource("classpath:Properties/password_msgs.properties")
 @PropertySource("classpath:Properties/common_msgs.properties")
+
 @EnableEncryptableProperties
 @OpenAPIDefinition
 @Configuration

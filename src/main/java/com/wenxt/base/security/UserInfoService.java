@@ -9,34 +9,35 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service; 
+import org.springframework.stereotype.Service;
+
+import com.wenxt.base.userMaster.LM_MENU_USERS;
+import com.wenxt.base.userMaster.UserMasterRepository;
 
 @Service
 @Primary
-public class UserInfoService implements UserDetailsService { 
+public class UserInfoService implements UserDetailsService {
 
 	@Autowired
-	private UserInfoRepository repository; 
-	
+	private UserMasterRepository userrrepo;
+
 	@Autowired
 	private StringEncryptor encryptor;
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException { 
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-		Optional<UserInfo> userDetail = repository.findByCustommName(username); 
+		Optional<LM_MENU_USERS> userDetail = userrrepo.findByUserId(username);
 
-		// Converting userDetail to UserDetails 
-		return userDetail.map(UserInfoDetails::new) 
-				.orElseThrow(() -> new UsernameNotFoundException("User not found " + username)); 
-	} 
+		// Converting userDetail to UserDetails
+		return userDetail.map(UserInfoDetails::new)
+				.orElseThrow(() -> new UsernameNotFoundException("User not found " + username));
+	}
+//
+//	public String addUser(UserInfo userInfo) { 
+//		userInfo.setPassword(encryptor.encrypt(userInfo.getPassword())); 
+//		repository.save(userInfo); 
+//		return "User Added Successfully"; 
+//	} 
 
-	public String addUser(UserInfo userInfo) { 
-		userInfo.setPassword(encryptor.encrypt(userInfo.getPassword())); 
-		repository.save(userInfo); 
-		return "User Added Successfully"; 
-	} 
-
-
-} 
-
+}

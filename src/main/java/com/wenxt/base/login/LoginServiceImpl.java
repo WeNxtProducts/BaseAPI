@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
+
 import org.jasypt.encryption.StringEncryptor;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,13 +18,14 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -30,36 +33,39 @@ import org.springframework.web.client.RestTemplate;
 import com.wenxt.base.commonUtils.LOVDTO;
 import com.wenxt.base.security.AuthRequest;
 import com.wenxt.base.security.JwtService;
-import com.wenxt.base.security.UserInfo;
-import com.wenxt.base.security.UserInfoRepository;
+import com.wenxt.base.userMaster.LM_MENU_USERS;
+import com.wenxt.base.userMaster.UserMasterRepository;
 
 @Service
 public class LoginServiceImpl implements LoginService {
 
 	@Autowired
 	private KieContainer kieContainer;
-	
+
 	@Autowired
 	private LoginRepository repo;
-	
+
+//	@Autowired
+//	private LoginDao loginDao;
+
 	@Autowired
-	private AuthenticationManager authenticationManager; 
-	
+	private AuthenticationManager authenticationManager;
+
 	@Autowired
 	private JwtService jwtService;
-	
+
 	@Autowired
-	private UserInfoRepository repository;
- 
-    @Autowired
-    private StringEncryptor encryptor;
-    	
+	private UserMasterRepository userrepo;
+
 	@Autowired
-    private JavaMailSender javaMailSender;
+	private StringEncryptor encryptor;
+
+	@Autowired
+	private JavaMailSender javaMailSender;
 
 	@Value("${get.company.message}")
 	private String getCompanyMessage;
-	
+
 	@Value("${get.language.message}")
 	private String getLanguageMessage;
 
@@ -68,22 +74,22 @@ public class LoginServiceImpl implements LoginService {
 
 	@Value("${get.department.message}")
 	private String getDepartmentMessage;
-	
+
 	@Value("${user.login.message}")
 	private String loginMessage;
-	
+
 	@Value("${reset.password.token}")
 	private String newToken;
-	
+
 	@Value("${reset.password.mail}")
 	private String resetPasswordMail;
-	
+
 	@Value("${reset.password.message}")
 	private String resetPassword;
-	
+
 	@Value("${spring.project.baseUrl}")
 	private String getBaseURL;
-	
+
 	@Value("${spring.success.code}")
 	private String successCode;
 
@@ -101,7 +107,7 @@ public class LoginServiceImpl implements LoginService {
 
 	@Value("${spring.data.code}")
 	private String dataCode;
-	
+
 	@Override
 	public String getCompany(LoginDropDownRequestModel user) {
 
@@ -161,7 +167,8 @@ public class LoginServiceImpl implements LoginService {
 		JSONObject response = new JSONObject();
 
 		RestTemplate restTemplate = new RestTemplate();
-		String url = getBaseURL + "common/getparamlov?queryId=11&MUCD_COMP_CODE=" + user.getCompanyCode() + "&muc_user_id=" + user.getUserId();
+		String url = getBaseURL + "common/getparamlov?queryId=11&MUCD_COMP_CODE=" + user.getCompanyCode()
+				+ "&muc_user_id=" + user.getUserId();
 		ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
 		if (responseEntity.getStatusCode() == HttpStatus.OK) {
 			String serviceResponse = responseEntity.getBody();
@@ -193,7 +200,8 @@ public class LoginServiceImpl implements LoginService {
 
 //		List<KeyValueModel> list = loginDao.getDept(user.getUserId(), user.getCompanyCode(), user.getBranchCode());
 		RestTemplate restTemplate = new RestTemplate();
-		String url = getBaseURL + "common/getparamlov?queryId=12&MUCD_COMP_CODE=" + user.getCompanyCode() + "&muc_user_id=" + user.getUserId() + "&mucd_divn_code=" + user.getBranchCode();
+		String url = getBaseURL + "common/getparamlov?queryId=12&MUCD_COMP_CODE=" + user.getCompanyCode()
+				+ "&muc_user_id=" + user.getUserId() + "&mucd_divn_code=" + user.getBranchCode();
 		ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
 		if (responseEntity.getStatusCode() == HttpStatus.OK) {
 			String serviceResponse = responseEntity.getBody();
@@ -221,9 +229,53 @@ public class LoginServiceImpl implements LoginService {
 
 	@Override
 	public String login(LoginRequestModel login) {
+//		JSONObject response = new JSONObject();
+//		Map<String, Object> data = new HashMap<>();
+//
+//		AuthRequest auth = new AuthRequest();
+//		auth.setUsername(login.getUserName());
+//		auth.setPassword(login.getPassword());
+//		auth.setDivision(login.getDivisionCode());
+//		auth.setDepartment(login.getDepartmentCode());
+//		auth.setCompany(login.getCompanyCode());
+//		auth.setBaseCurrency("INR");
+//		String token = "";
+//
+//		Authentication authenticationToken = new UsernamePasswordAuthenticationToken(login.getUserName(),
+//				login.getPassword());
+//		Authentication authentication = authenticationManager.authenticate(authenticationToken);
+//		token = jwtService.generateToken(auth);
+//		if (authentication.isAuthenticated()) {
+//			boolean isFlagSet = checkFlagInMenuTable(authentication); // Check flag in lm_menu table
+//			if (isFlagSet) {
+//				data.put("Token", token);
+//				data.put("URL", "/resetpassword");
+//				response.put("Status", "REDIRECT");
+//				response.put("status_msg", "Please direct to reset password page");
+//				response.put("Data", data);
+//				return response.toString();
+//			} else {
+//
+//				if (token != null) {
+//					data.put("Token", token);
+//					data.put("MenuList", null);
+//					response.put("Status", "SUCCESS");
+//					response.put("status_msg", "User Logged In Successfully");
+//					response.put("Data", data);
+//					return response.toString();
+//				} else {
+//					response.put("Status", "FAILURE");
+//					return response.toString();
+//				}
+//			}
+//		} else {
+//			response.put("Status", "FAILURE");
+//			return response.toString();
+//		}
+//	}
 		JSONObject response = new JSONObject();
 		Map<String, Object> data = new HashMap<>();
-		
+
 		AuthRequest auth = new AuthRequest();
 		auth.setUsername(login.getUserName());
 		auth.setPassword(login.getPassword());
@@ -232,35 +284,71 @@ public class LoginServiceImpl implements LoginService {
 		auth.setCompany(login.getCompanyCode());
 		auth.setBaseCurrency("INR");
 		String token = "";
+
 		try {
-		 Authentication authenticationToken =
-		            new UsernamePasswordAuthenticationToken(login.getUserName(), login.getPassword());
-			Authentication authentication = authenticationManager.authenticate(authenticationToken); 
+			// Try to authenticate the user
+			Authentication authenticationToken = new UsernamePasswordAuthenticationToken(login.getUserName(),
+					login.getPassword());
+			Authentication authentication = authenticationManager.authenticate(authenticationToken);
+
+			// Generate JWT token
+			token = jwtService.generateToken(auth);
+
+			// Check if authentication is successful
 			if (authentication.isAuthenticated()) {
-				token = jwtService.generateToken(auth); 
-				if(token != null) {
+				boolean isFlagSet = checkFlagInMenuTable(authentication); // Check flag in lm_menu table
+				if (isFlagSet) {
 					data.put("Token", token);
-					data.put("MenuList", null);
-					response.put(statusCode, successCode);
-					response.put(messageCode, loginMessage);
-					response.put(dataCode, data);
+					data.put("URL", "/resetpassword");
+					response.put("Status", "REDIRECT");
+					response.put("status_msg", "Please direct to reset password page");
+					response.put("Data", data);
 					return response.toString();
-				}
-				else {
-					response.put(statusCode, errorCode);
-					return response.toString();
+				} else {
+					if (token != null) {
+						data.put("Token", token);
+						data.put("MenuList", null);
+						response.put("Status", "SUCCESS");
+						response.put("status_msg", "User Logged In Successfully");
+						response.put("Data", data);
+						return response.toString();
+					} else {
+						response.put("Status", "FAILURE");
+						return response.toString();
+					}
 				}
 			} else {
-				response.put(statusCode, errorCode);
-				return response.toString();
-			} 
-			}catch(Exception e) {
-				response.put(statusCode, errorCode);
-				response.put(messageCode, e.getMessage());
+				response.put("Status", "FAILURE");
 				return response.toString();
 			}
-			
+		} catch (BadCredentialsException e) {
+			// Handle incorrect password
+			response.put("Status", "FAILURE");
+			response.put("Message", "Incorrect password");
+			return response.toString();
+		} catch (UsernameNotFoundException e) {
+			// Handle username not found
+			response.put("Status", "FAILURE");
+			response.put("Message", "Username not found");
+			return response.toString();
 		}
+	}
+
+	private boolean checkFlagInMenuTable(Authentication authentication) {
+		if (authentication != null && authentication.isAuthenticated()) {
+			// Retrieve the username of the logged-in user
+			String username = authentication.getName();
+
+			// Assuming you have access to the repository and a method to find the user by
+			// username
+			LM_MENU_USERS menuUser = userrepo.findByUserIdAndUserFirstLoginyn(username, true);
+
+			// Check if menuUser is not null, indicating the flag is set for the logged-in
+			// user
+			return menuUser != null;
+		}
+		return false;
+	}
 
 	@Override
 	public String getLang() {
@@ -289,18 +377,18 @@ public class LoginServiceImpl implements LoginService {
 		}
 		List<JSONObject> data = new ArrayList<>();
 		JSONObject languageResponse = new JSONObject();
-		
+
 		response.put(statusCode, successCode);
 		response.put(messageCode, getLanguageMessage);
-		
-		for(LOVDTO language : list) {
-			if(language.getValue().equals("English")) {
+
+		for (LOVDTO language : list) {
+			if (language.getValue().equals("English")) {
 				languageResponse = new JSONObject();
 				languageResponse.put("label", language.getLabel());
 				languageResponse.put("value", language.getValue());
 				languageResponse.put("IsDefault", "True");
 				data.add(languageResponse);
-			}else {
+			} else {
 				languageResponse = new JSONObject();
 				languageResponse.put("label", language.getLabel());
 				languageResponse.put("value", language.getValue());
@@ -311,55 +399,74 @@ public class LoginServiceImpl implements LoginService {
 		response.put(dataCode, data);
 		return response.toString();
 	}
-	
+
 	@Override
-	public String resetPassword(String name, String password, String newPassword, String confirmPassword) {
+	public String resetProfilePassword(String password, String newPassword, String confirmPassword) {
 		JSONObject response = new JSONObject();
+
 		if (!newPassword.equals(confirmPassword)) {
 			return "New password and confirm password do not match!";
 		}
 
-		Optional<UserInfo> userOptional = repository.findByCustommName(name);
+		// Retrieve the username from JWT token
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String jwtuser = authentication.getName();
+
+		Optional<LM_MENU_USERS> userOptional = userrepo.findByUserId(jwtuser);
 
 		if (userOptional.isPresent()) {
-			UserInfo user = userOptional.get();
+			LM_MENU_USERS user = userOptional.get();
 
-			String hashedPassword = user.getPassword();
+			String hashedPassword = user.getUser_passwd();
 
 			String decryptedPassword = encryptor.decrypt(hashedPassword);
 			if (password.equals(decryptedPassword)) {
 				// Encode and set the new password
-				user.setPassword(encryptor.encrypt(newPassword));
-				repository.save(user);
-				response.put(statusCode, successCode);
-				response.put(messageCode, resetPassword);
-				
+				user.setUser_passwd(encryptor.encrypt(newPassword));
+				user.setUserFirstLoginyn(false);
+				userrepo.save(user);
+				response.put("Status", "SUCCESS");
+				response.put("status_msg", "Password reset successful");
+
 				return response.toString();
 			} else {
-				return "Invalid password!";
+				response.put("Status", "FAILURE");
+				response.put("status_msg", "Invalid password!");
+				return response.toString();
 			}
 		} else {
-			return "User not found!";
+			response.put("Status", "FAILURE");
+			response.put("status_msg", "User not found!");
+			return response.toString();
 		}
 	}
 
 	@Override
-	public String processForgotPassword(String email) throws Exception {
+	public ResponseEntity<String> processForgotPassword(String email) {
 		JSONObject response = new JSONObject();
-		UserInfo user = repository.findByEmail(email);
-		if (user == null) {
-			throw new Exception("User not found");
+		try {
+			LM_MENU_USERS user = userrepo.findByUserEmailId(email);
+			if (user == null) {
+				response.put("Status", "FAILURE");
+				response.put("Message", "User not found");
+
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response.toString());
+			}
+
+			String token = UUID.randomUUID().toString();
+			user.setUserResettoken(token);
+			userrepo.save(user);
+			response.put("Status", "SUCCESS");
+			response.put("Message", "Reset password email sent successfully");
+
+			sendResetPasswordEmail(user.getUserEmailId(), token);
+
+			return ResponseEntity.ok(response.toString());
+		} catch (Exception e) {
+			response.put("Status", "FAILURE");
+			response.put("Message", "Failed to reset password: " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response.toString());
 		}
-
-		String token = UUID.randomUUID().toString();
-		user.setResetToken(token);
-		repository.save(user);
-		response.put(statusCode, successCode);
-		response.put(messageCode, resetPasswordMail);
-
-		sendResetPasswordEmail(user.getEmail(), token);
-		
-		return response.toString();
 	}
 
 	private void sendResetPasswordEmail(String email, String token) {
@@ -374,22 +481,35 @@ public class LoginServiceImpl implements LoginService {
 	}
 
 	@Override
-	public String resetPassword(String token, String newPassword) throws InvalidTokenException {
+	public ResponseEntity<String> resetPassword(String token, String newPassword, String confirmPassword)
+			throws InvalidTokenException {
 		JSONObject response = new JSONObject();
-		UserInfo user = repository.findByResetToken(token);
-		if (user != null) {
+		try {
+			LM_MENU_USERS user = userrepo.findByUserResettoken(token);
+			if (user != null) {
+				// Update user's password and reset token
+				user.setUser_passwd(encryptor.encrypt(newPassword));
+				user.setUserResettoken(null);
 
-			user.setPassword(encryptor.encrypt(newPassword));
+				userrepo.save(user);
 
-			user.setResetToken(null);
+				// Generate new token
+				String newToken = UUID.randomUUID().toString();
 
-			repository.save(user);
-			
-			response.put(statusCode, successCode);
-			response.put(messageCode, newToken);
-			return response.toString();
-		} else {
-			throw new InvalidTokenException("Invalid token");
+				response.put("Status", "SUCCESS");
+				response.put("Message", "password reset sucessfully");
+				return ResponseEntity.ok(response.toString());
+			} else {
+				// Invalid token
+				response.put("Status", "FAILURE");
+				response.put("Message", "Invalid token");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.toString());
+			}
+		} catch (Exception e) {
+			// Exception occurred
+			response.put("Status", "FAILURE");
+			response.put("Message", "Failed to reset password: " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response.toString());
 		}
 	}
 
