@@ -23,4 +23,7 @@ public interface LoginService {
 
 	public String resetProfilePassword(String password, String newPassword, String confirmPassword);
 
+	public String password(String username, String password, String userId);
+
+
 }

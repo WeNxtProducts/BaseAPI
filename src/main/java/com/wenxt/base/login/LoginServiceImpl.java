@@ -324,12 +324,12 @@ public class LoginServiceImpl implements LoginService {
 		} catch (BadCredentialsException e) {
 			// Handle incorrect password
 			response.put("Status", "FAILURE");
-			response.put("Message", "Incorrect password");
+			response.put("status_msg", "Incorrect password");
 			return response.toString();
 		} catch (UsernameNotFoundException e) {
 			// Handle username not found
 			response.put("Status", "FAILURE");
-			response.put("Message", "Username not found");
+			response.put("status_msg", "Username not found");
 			return response.toString();
 		}
 	}
@@ -448,7 +448,7 @@ public class LoginServiceImpl implements LoginService {
 			LM_MENU_USERS user = userrepo.findByUserEmailId(email);
 			if (user == null) {
 				response.put("Status", "FAILURE");
-				response.put("Message", "User not found");
+				response.put("status_msg", "User not found");
 
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response.toString());
 			}
@@ -457,14 +457,14 @@ public class LoginServiceImpl implements LoginService {
 			user.setUserResettoken(token);
 			userrepo.save(user);
 			response.put("Status", "SUCCESS");
-			response.put("Message", "Reset password email sent successfully");
+			response.put("status_msg", "Reset password email sent successfully");
 
 			sendResetPasswordEmail(user.getUserEmailId(), token);
 
 			return ResponseEntity.ok(response.toString());
 		} catch (Exception e) {
 			response.put("Status", "FAILURE");
-			response.put("Message", "Failed to reset password: " + e.getMessage());
+			response.put("status_msg", "Failed to reset password: " + e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response.toString());
 		}
 	}
@@ -497,20 +497,68 @@ public class LoginServiceImpl implements LoginService {
 				String newToken = UUID.randomUUID().toString();
 
 				response.put("Status", "SUCCESS");
-				response.put("Message", "password reset sucessfully");
+				response.put("status_msg", "password reset sucessfully");
 				return ResponseEntity.ok(response.toString());
 			} else {
 				// Invalid token
 				response.put("Status", "FAILURE");
-				response.put("Message", "Invalid token");
+				response.put("status_msg", "Invalid token");
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.toString());
 			}
 		} catch (Exception e) {
 			// Exception occurred
 			response.put("Status", "FAILURE");
-			response.put("Message", "Failed to reset password: " + e.getMessage());
+			response.put("status_msg", "Failed to reset password: " + e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response.toString());
 		}
 	}
+	@Override
+	public String password(String username, String password, String userId) {
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    JSONObject response = new JSONObject();
+	    Map<String, Object> data = new HashMap<>();
 
+	    if (authentication != null && authentication.isAuthenticated()) {
+	        String jwtUser = authentication.getName();
+
+	        if ("ADMIN".equals(username) && "ADMIN".equals(jwtUser)) {
+	            // Assuming userrepo is a repository for user data
+	            List<LM_MENU_USERS> userList = userrepo.findAll();
+
+	            // Find the user by userId
+	            Optional<LM_MENU_USERS> userOptional = userList.stream()
+	                    .filter(user -> userId.equals(user.getUserId()))
+	                    .findFirst();
+
+	            if (userOptional.isPresent()) {
+	                LM_MENU_USERS user = userOptional.get();
+	                String encryptedPassword = user.getUser_passwd();
+	                String decryptedPassword = encryptor.decrypt(encryptedPassword);
+
+	                // Verify admin password
+	                if (password.equals("Test@123")) {
+	                    data.put("UserID", user.getUserId());
+	                    data.put("Password", decryptedPassword);
+	                    response.put("Status", "SUCCESS");
+	                    response.put("status_msg", "Password retrieved successfully");
+	                    response.put("Data", data);
+	                } else {
+	                    response.put("Status", "FAILURE");
+	                    response.put("status_msg", "Invalid admin password");
+	                }
+	            } else {
+	                response.put("Status", "FAILURE");
+	                response.put("status_msg", "User not found");
+	            }
+	        } else {
+	            response.put("Status", "FAILURE");
+	            response.put("status_msg", "Invalid user");
+	        }
+	    } else {
+	        response.put("Status", "FAILURE");
+	        response.put("status_msg", "User not authenticated");
+	    }
+
+	    return response.toString();
+	}
 }

@@ -74,6 +74,8 @@ public class SecurityConfig {
 				.authorizeHttpRequests().requestMatchers("/common/**").authenticated() 
 				.and()
 				.authorizeHttpRequests().requestMatchers("/usermaster/**").authenticated() 
+				.and()
+				.authorizeHttpRequests().requestMatchers("/auth/password_view").authenticated()
 				.and() 
 				.sessionManagement() 
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS) 
