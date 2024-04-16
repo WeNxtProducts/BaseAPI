@@ -93,5 +93,10 @@ public class CommonController {
 	public void serviceToJson(HttpServletRequest request) {
 		service.serviceToJson(request);
 	}
+	
+	@PostMapping("/test")
+	public String test(HttpServletRequest request) {
+		return service.test(request);
+	}
 
 }

@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
@@ -29,7 +30,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.wenxt.base.userMaster.LM_MENU_USERS;
 
 import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.UserAgent;
@@ -609,9 +616,7 @@ public class CommonServiceImpl implements CommonService {
 		input.setScreenCode((String) params.get("screenCode"));
 		input.setScreenName((String) params.get("screenName"));
 		input.setServiceName((String) params.get("serviceName"));
-
-		System.out.println(params.get("screenCode") + "*" + params.get("screenName") + "*" + params.get("serviceName"));
-
+ 
 		service_url_mapping object = commonDao.getUrlData(input);
 
 		String filePath = object.getserv_response() + object.getserv_screen_name() + "_" + object.getserv_type()
@@ -624,11 +629,12 @@ public class CommonServiceImpl implements CommonService {
 			FileWriter fileWriter = new FileWriter(file);
 			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 			RestTemplate restTemplate = new RestTemplate();
-			String url = getBaseURL + object.getserv_url() + "?" + request.getQueryString()
-					+ "&screenCode=USERMASTER&screenName=USERCREATE";
+			String url = getBaseURL + object.getserv_url() + "?"
+					+ "screenCode=" + params.get("screenCode") + "&screenName=" + params.get("screenName");
 			ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
 			if (responseEntity.getStatusCode() == HttpStatus.OK) {
 				String serviceResponse = responseEntity.getBody();
+				System.out.println(serviceResponse);
 				bufferedWriter.write(serviceResponse);
 			} else {
 				throw new UsernameNotFoundException("JUST CHECK");
@@ -638,6 +644,54 @@ public class CommonServiceImpl implements CommonService {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public String test(HttpServletRequest request) {
+		JSONObject result = new JSONObject();
+		ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+		Map<String, Object> params = processParamLOV(null, request);
+		try {
+//			Map<String, Object> test;
+//				test = mapper.readValue(new File("D:\\Common_getFieldList.json"), 
+//							new TypeReference<Map<String, Object>>() {});
+//		 	List<LM_PROG_FIELD_DEFN_NEW> object = commonDao.getFrontFormDetails();
+			JsonNode innerNode = null;
+			JsonNode node = mapper
+					.readTree(new File("D:\\" + params.get("screenName") + "_" + params.get("serviceName") + ".json"));
+
+			String tableName = ((ObjectNode) node).get("Front_Form").get("Form_Fields").get("user_initial")
+					.get("PFD_TABLE_NAME").toString();
+			LM_MENU_USERS users = commonDao.getTransactionData((String) params.get("tranId"),
+					tableName.substring(1, tableName.length() - 1));
+			for (int i = 0; i < users.getClass().getDeclaredFields().length; i++) {
+				Field field = users.getClass().getDeclaredFields()[i];
+				field.setAccessible(true);
+				Object value;
+				try {
+					value = field.get(users);
+					String fieldName = field.getName();
+					if (((ObjectNode) node).get("Front_Form").get("Form_Fields").get(fieldName) != null) {
+						innerNode = ((ObjectNode) node).get("Front_Form").get("Form_Fields").get(fieldName);
+						((ObjectNode) innerNode).putPOJO("PFD_FLD_VALUE", value);
+					}else if(((ObjectNode) node).get("Static_Details").get("Form_Fields").get(fieldName) != null) {
+						innerNode = ((ObjectNode) node).get("Front_Form").get("Form_Fields").get(fieldName);
+						((ObjectNode) innerNode).putPOJO("PFD_FLD_VALUE", value);
+					}
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					e.printStackTrace();
+				}
+			}
+			return node.toString();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+//		return node;
+		return dataCode;
+
 	}
 
 }

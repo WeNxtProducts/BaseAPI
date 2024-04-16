@@ -11,6 +11,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.wenxt.base.userMaster.LM_MENU_USERS;
+
 
 @Repository
 public class CommonDaoImpl implements CommonDao {
@@ -93,6 +95,20 @@ public class CommonDaoImpl implements CommonDao {
 	public service_url_mapping getUrlData(AsyncDTO object) {
 		String sql = "SELECT * FROM service_url_mapping WHERE serv_prog_code = ? AND serv_screen_name = ? AND serv_service_name = ?";
 		service_url_mapping result = template.queryForObject(sql, new Object[] {object.getScreenCode(), object.getScreenName(), object.getServiceName()}, new BeanPropertyRowMapper<>(service_url_mapping.class));
+		return result;
+	}
+
+	@Override
+	public LM_MENU_USERS getTransactionData(String tranId, String tableName) {
+		String sql = "SELECT * FROM " + tableName + " WHERE user_id = '" +  tranId + "'";
+        LM_MENU_USERS result = template.queryForObject(sql, new BeanPropertyRowMapper<>(LM_MENU_USERS.class));
+        return result;
+	}
+	
+	@Override
+	public List<LM_PROG_FIELD_DEFN_NEW> getFrontFormDetails(){
+		String sql = "SELECT * FROM LM_PROG_FIELD_DEFN WHERE PFD_FORM_ITEM_TYPE1 = 'FrontFormField' AND PFD_PROG_CODE = 'USERMASTER' AND PFD_SCREEN_NAME = 'USERCREATE'";
+		List<LM_PROG_FIELD_DEFN_NEW> result = template.query(sql, new BeanPropertyRowMapper<>(LM_PROG_FIELD_DEFN_NEW.class));
 		return result;
 	}
 

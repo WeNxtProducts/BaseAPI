@@ -34,4 +34,6 @@ public interface CommonService {
 	
 	public void serviceToJson(HttpServletRequest request);
 
+	public String test(HttpServletRequest request);
+
 }

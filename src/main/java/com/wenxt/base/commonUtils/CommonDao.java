@@ -3,6 +3,8 @@ package com.wenxt.base.commonUtils;
 import java.util.List;
 import java.util.Map;
 
+import com.wenxt.base.userMaster.LM_MENU_USERS;
+
 public interface CommonDao {
 
 	List<MenuResultDTO> getMenuList(String groupId, String query);
@@ -22,5 +24,9 @@ public interface CommonDao {
 	service_url_mapping getUrlData(AsyncDTO object);
 
 	List<Map<String, Object>> getMrvListing(String query, Map<String, Object> paramsList);
+	
+	LM_MENU_USERS getTransactionData(String tranId, String tableName);
+
+	List<LM_PROG_FIELD_DEFN_NEW> getFrontFormDetails();
 
 }
