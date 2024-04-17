@@ -41,6 +41,9 @@ public class UserMasterController {
 	        		
 	    }
 	 
-	 
+	 @PostMapping("/createUser")
+     public String createLmUser(@RequestBody RequestDataDto requestData) {
+         return master.createLmUser(requestData);
+     }
 }
 

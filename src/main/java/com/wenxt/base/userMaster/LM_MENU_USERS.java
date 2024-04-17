@@ -83,8 +83,6 @@ public class LM_MENU_USERS {
 	private String	user_passwd_expiry_yn;
 	@Nullable
 	private String	user_expiry_dt;
-	@Nullable
-	private String	user_warning_days;
 	@Column(name="user_first_login_yn")
 	private Boolean userFirstLoginyn;
 	@Nullable
@@ -149,7 +147,8 @@ public class LM_MENU_USERS {
 	@Column(name="user_reset_token")
 	private String userResettoken;
 	
-	
+	@Column(name = "user_warning_days")
+    private Double user_warning_days;
 	
 	
 	public String getUserResettoken() {
@@ -381,12 +380,7 @@ public class LM_MENU_USERS {
 	public void setUser_expiry_dt(String user_expiry_dt) {
 		this.user_expiry_dt = user_expiry_dt;
 	}
-	public String getUser_warning_days() {
-		return user_warning_days;
-	}
-	public void setUser_warning_days(String user_warning_days) {
-		this.user_warning_days = user_warning_days;
-	}
+
 	
 	
 	
@@ -569,6 +563,12 @@ public class LM_MENU_USERS {
 	}
 	public void setUser_signature(String user_signature) {
 		this.user_signature = user_signature;
+	}
+	public Double getUser_warning_days() {
+		return user_warning_days;
+	}
+	public void setUser_warning_days(Double user_warning_days) {
+		this.user_warning_days = user_warning_days;
 	}
 	
 	

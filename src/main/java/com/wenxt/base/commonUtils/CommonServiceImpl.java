@@ -317,12 +317,11 @@ public class CommonServiceImpl implements CommonService {
 		JSONObject response = new JSONObject();
 		QUERY_MASTER query = commonDao.getQueryLov(queryId);
 		if (query != null) {
-//			if (query.getQM_QUERY_TYPE().equals("lov")) {
-//				List<LOVDTO> queryResult = commonDao.executeLOVQuery(query.getQM_QUERY(), new HashMap());
-//				response.put(statusCode, successCode);
-//				response.put(dataCode, queryResult);
-//			} else 
-				if (query.getQM_QUERY_TYPE().equals("paramlov")) {
+			if (query.getQM_QUERY_TYPE().equals("lov")) {
+				List<LOVDTO> queryResult = commonDao.executeLOVQuery(query.getQM_QUERY(), new HashMap());
+				response.put(statusCode, successCode);
+				response.put(dataCode, queryResult);
+			} else if (query.getQM_QUERY_TYPE().equals("paramlov")) {
 				List<QUERY_PARAM_MASTER> queryParams = commonDao.getQueryParams(query.getQM_SYS_ID());
 				Map<String, Object> paramsMap = processParamLOV(queryParams, request);
 				paramsMap.remove("queryId");
@@ -664,7 +663,7 @@ public class CommonServiceImpl implements CommonService {
 //		 	List<LM_PROG_FIELD_DEFN_NEW> object = commonDao.getFrontFormDetails(); 
 			JsonNode innerNode = null;
 			JsonNode node = mapper
-					.readTree(new File("D:\\" + params.get("screenName") + "_" + params.get("serviceName") + ".json"));
+					.readTree(new File(basePath + params.get("screenName") + "_" + params.get("serviceName") + ".json"));
 
 			String tableName = ((ObjectNode) node).get("Front_Form").get("Form_Fields").get("user_initial")
 					.get("PFD_TABLE_NAME").toString();

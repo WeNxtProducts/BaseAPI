@@ -9,5 +9,7 @@ public interface UserMasterService {
 	public String deleteUserById(String userId);
 	
 	public String getUserById(String userId);
+	
+	public String createLmUser(RequestDataDto requestData);
 
 }
