@@ -74,6 +74,9 @@ public class CommonServiceImpl implements CommonService {
 
 	@Value("${spring.data.code}")
 	private String dataCode;
+	
+	@Value("${spring.project.basePath}")
+	private String basePath;
 
 	@Value("${spring.project.baseUrl}")
 	private String getBaseURL;
@@ -314,11 +317,12 @@ public class CommonServiceImpl implements CommonService {
 		JSONObject response = new JSONObject();
 		QUERY_MASTER query = commonDao.getQueryLov(queryId);
 		if (query != null) {
-			if (query.getQM_QUERY_TYPE().equals("lov")) {
-				List<LOVDTO> queryResult = commonDao.executeLOVQuery(query.getQM_QUERY(), new HashMap());
-				response.put(statusCode, successCode);
-				response.put(dataCode, queryResult);
-			} else if (query.getQM_QUERY_TYPE().equals("paramlov")) {
+//			if (query.getQM_QUERY_TYPE().equals("lov")) {
+//				List<LOVDTO> queryResult = commonDao.executeLOVQuery(query.getQM_QUERY(), new HashMap());
+//				response.put(statusCode, successCode);
+//				response.put(dataCode, queryResult);
+//			} else 
+				if (query.getQM_QUERY_TYPE().equals("paramlov")) {
 				List<QUERY_PARAM_MASTER> queryParams = commonDao.getQueryParams(query.getQM_SYS_ID());
 				Map<String, Object> paramsMap = processParamLOV(queryParams, request);
 				paramsMap.remove("queryId");
@@ -392,23 +396,25 @@ public class CommonServiceImpl implements CommonService {
 				} else if (result.get(i).getPFD_FORM_ITEM_TYPE1().equals("FrontForm")) {
 					frontFormFields.put("Label", result.get(i).getPFD_FLD_NAME());
 					frontFormMap = result.stream()
-							.filter(item -> item.getPFD_FORM_ITEM_TYPE1().equals("FrontFormField")).peek(item -> {
-								if (item.getPFD_DATA_TYPE() != null && item.getPFD_DATA_TYPE().equals("lov")
-										|| item.getPFD_DATA_TYPE() != null
-												&& item.getPFD_DATA_TYPE().equals("searchlov")) {
-									QUERY_MASTER query = commonDao.getQueryLov(Integer.parseInt(item.getPFD_PARAM_1()));
-									List<LOVDTO> list = commonDao.executeLOVQuery(query.getQM_QUERY(), null);
-									item.setOptions(list);
-								} else if (item.getPFD_DATA_TYPE() != null
-										&& item.getPFD_DATA_TYPE().equals("paramlov")) {
-									QUERY_MASTER query = commonDao.getQueryLov(Integer.parseInt(item.getPFD_PARAM_1()));
-									List<QUERY_PARAM_MASTER> queryParams = commonDao
-											.getQueryParams(query.getQM_SYS_ID());
-									Map<String, Object> processedParams = processParamLOV(queryParams, request);
-									List<LOVDTO> list = commonDao.executeLOVQuery(query.getQM_QUERY(), processedParams);
-									item.setOptions(list);
-								}
-							})
+							.filter(item -> item.getPFD_FORM_ITEM_TYPE1().equals("FrontFormField"))
+//							.peek(item -> {
+//								if (item.getPFD_DATA_TYPE() != null && item.getPFD_DATA_TYPE().equals("lov")
+//										|| item.getPFD_DATA_TYPE() != null
+//												&& item.getPFD_DATA_TYPE().equals("searchlov")) {
+//									QUERY_MASTER query = commonDao.getQueryLov(Integer.parseInt(item.getPFD_PARAM_1()));
+//									List<LOVDTO> list = commonDao.executeLOVQuery(query.getQM_QUERY(), null);
+//									item.setOptions(list);
+//								} else 
+//									if (item.getPFD_DATA_TYPE() != null
+//										&& item.getPFD_DATA_TYPE().equals("paramlov")) {
+//									QUERY_MASTER query = commonDao.getQueryLov(Integer.parseInt(item.getPFD_PARAM_1()));
+//									List<QUERY_PARAM_MASTER> queryParams = commonDao
+//											.getQueryParams(query.getQM_SYS_ID());
+//									Map<String, Object> processedParams = processParamLOV(queryParams, request);
+//									List<LOVDTO> list = commonDao.executeLOVQuery(query.getQM_QUERY(), processedParams);
+//									item.setOptions(list);
+//								}
+//							})
 							.collect(Collectors.toMap(LM_PROG_FIELD_DEFN_NEW::getPFD_COLUMN_NAME, Function.identity()));
 				} else if (result.get(i).getPFD_FORM_ITEM_TYPE1().equals("AccordionHeader")) {
 					JSONObject accordionResponse = new JSONObject();
@@ -489,19 +495,21 @@ public class CommonServiceImpl implements CommonService {
 								&& object.getPFD_FORM_ITEM_TYPE2().equals(accordionFieldName))
 						.collect(Collectors.toList());
 				fieldsMap = accordFieldsList.stream()
-						.filter(item -> item.getPFD_FORM_ITEM_TYPE2().equals(accordionFieldName)).peek(item -> {
-							if (item.getPFD_DATA_TYPE() != null && item.getPFD_DATA_TYPE().equals("lov")) {
-								QUERY_MASTER query = commonDao.getQueryLov(Integer.parseInt(item.getPFD_PARAM_1()));
-								List<LOVDTO> list = commonDao.executeLOVQuery(query.getQM_QUERY(), null);
-								item.setOptions(list);
-							} else if (item.getPFD_DATA_TYPE() != null && item.getPFD_DATA_TYPE().equals("paramlov")) {
-								QUERY_MASTER query = commonDao.getQueryLov(Integer.parseInt(item.getPFD_PARAM_1()));
-								List<QUERY_PARAM_MASTER> queryParams = commonDao.getQueryParams(query.getQM_SYS_ID());
-								Map<String, Object> processedParams = processParamLOV(queryParams, request);
-								List<LOVDTO> list = commonDao.executeLOVQuery(query.getQM_QUERY(), processedParams);
-								item.setOptions(list);
-							}
-						}).collect(Collectors.toMap(LM_PROG_FIELD_DEFN_NEW::getPFD_COLUMN_NAME, Function.identity()));
+						.filter(item -> item.getPFD_FORM_ITEM_TYPE2().equals(accordionFieldName))
+//						.peek(item -> {
+//							if (item.getPFD_DATA_TYPE() != null && item.getPFD_DATA_TYPE().equals("lov")) {
+//								QUERY_MASTER query = commonDao.getQueryLov(Integer.parseInt(item.getPFD_PARAM_1()));
+//								List<LOVDTO> list = commonDao.executeLOVQuery(query.getQM_QUERY(), null);
+//								item.setOptions(list);
+//							} else if (item.getPFD_DATA_TYPE() != null && item.getPFD_DATA_TYPE().equals("paramlov")) {
+//								QUERY_MASTER query = commonDao.getQueryLov(Integer.parseInt(item.getPFD_PARAM_1()));
+//								List<QUERY_PARAM_MASTER> queryParams = commonDao.getQueryParams(query.getQM_SYS_ID());
+//								Map<String, Object> processedParams = processParamLOV(queryParams, request);
+//								List<LOVDTO> list = commonDao.executeLOVQuery(query.getQM_QUERY(), processedParams);
+//								item.setOptions(list);
+//							}
+//						})
+						.collect(Collectors.toMap(LM_PROG_FIELD_DEFN_NEW::getPFD_COLUMN_NAME, Function.identity()));
 				resultFieldsMap.add(fieldsMap);
 				tabs.put("Form_Fields", fieldsMap);
 				fieldType.put(accordionFields.get(i).getPFD_FLD_NAME(), tabs);
@@ -616,9 +624,8 @@ public class CommonServiceImpl implements CommonService {
 		input.setScreenCode((String) params.get("screenCode"));
 		input.setScreenName((String) params.get("screenName"));
 		input.setServiceName((String) params.get("serviceName"));
- 
-		service_url_mapping object = commonDao.getUrlData(input);
 
+		service_url_mapping object = commonDao.getUrlData(input);
 		String filePath = object.getserv_response() + object.getserv_screen_name() + "_" + object.getserv_type()
 				+ ".json";
 
@@ -629,12 +636,11 @@ public class CommonServiceImpl implements CommonService {
 			FileWriter fileWriter = new FileWriter(file);
 			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 			RestTemplate restTemplate = new RestTemplate();
-			String url = getBaseURL + object.getserv_url() + "?"
-					+ "screenCode=" + params.get("screenCode") + "&screenName=" + params.get("screenName");
+			String url = getBaseURL + object.getserv_url() + "?" + "screenCode=" + params.get("screenCode")
+					+ "&screenName=" + params.get("screenName");
 			ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
 			if (responseEntity.getStatusCode() == HttpStatus.OK) {
 				String serviceResponse = responseEntity.getBody();
-				System.out.println(serviceResponse);
 				bufferedWriter.write(serviceResponse);
 			} else {
 				throw new UsernameNotFoundException("JUST CHECK");
@@ -647,7 +653,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
-	public String test(HttpServletRequest request) {
+	public String editFields(HttpServletRequest request) {
 		JSONObject result = new JSONObject();
 		ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 		Map<String, Object> params = processParamLOV(null, request);
@@ -655,7 +661,7 @@ public class CommonServiceImpl implements CommonService {
 //			Map<String, Object> test;
 //				test = mapper.readValue(new File("D:\\Common_getFieldList.json"), 
 //							new TypeReference<Map<String, Object>>() {});
-//		 	List<LM_PROG_FIELD_DEFN_NEW> object = commonDao.getFrontFormDetails();
+//		 	List<LM_PROG_FIELD_DEFN_NEW> object = commonDao.getFrontFormDetails(); 
 			JsonNode innerNode = null;
 			JsonNode node = mapper
 					.readTree(new File("D:\\" + params.get("screenName") + "_" + params.get("serviceName") + ".json"));
@@ -674,7 +680,7 @@ public class CommonServiceImpl implements CommonService {
 					if (((ObjectNode) node).get("Front_Form").get("Form_Fields").get(fieldName) != null) {
 						innerNode = ((ObjectNode) node).get("Front_Form").get("Form_Fields").get(fieldName);
 						((ObjectNode) innerNode).putPOJO("PFD_FLD_VALUE", value);
-					}else if(((ObjectNode) node).get("Static_Details").get("Form_Fields").get(fieldName) != null) {
+					} else if (((ObjectNode) node).get("Static_Details").get("Form_Fields").get(fieldName) != null) {
 						innerNode = ((ObjectNode) node).get("Front_Form").get("Form_Fields").get(fieldName);
 						((ObjectNode) innerNode).putPOJO("PFD_FLD_VALUE", value);
 					}
@@ -689,9 +695,36 @@ public class CommonServiceImpl implements CommonService {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-//		return node;
 		return dataCode;
 
+	}
+
+	@Override
+	public void lovToJson(HttpServletRequest request) {
+		JSONObject response = new JSONObject();
+		Map<String, Object> params = processParamLOV(null, request);
+		Map<String, List<LOVDTO>> resultMap = new HashMap<>();
+
+		String file_path = basePath + params.get("screenName") + "getLOVList.json";
+		QUERY_MASTER query = commonDao.getQueryLov(18);
+		if (query != null) {
+			List<LovToJsonDTO> result = commonDao.lovToJson(query.getQM_QUERY(), params.get("screenCode").toString(),
+					params.get("screenName").toString());
+			for (LovToJsonDTO item : result) {
+				resultMap.put(item.getColumnName(), commonDao.executeLOVQuery(item.getQuery(), null));
+			}
+			try {
+				File file = new File(file_path);
+				file.getParentFile().mkdirs();
+				FileWriter fileWriter = new FileWriter(file);
+				BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+				response.put("Result", resultMap);
+				bufferedWriter.write(response.get("Result").toString());
+				bufferedWriter.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

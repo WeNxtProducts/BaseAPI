@@ -94,9 +94,14 @@ public class CommonController {
 		service.serviceToJson(request);
 	}
 	
-	@PostMapping("/test")
-	public String test(HttpServletRequest request) {
-		return service.test(request);
+	@PostMapping("/editFields")
+	public String editFields(HttpServletRequest request) {
+		return service.editFields(request);
+	}
+	
+	@GetMapping("/lovtoJson")
+	public void lovToJson(HttpServletRequest request) {
+		service.lovToJson(request);
 	}
 
 }

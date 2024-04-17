@@ -29,4 +29,6 @@ public interface CommonDao {
 
 	List<LM_PROG_FIELD_DEFN_NEW> getFrontFormDetails();
 
+	List<LovToJsonDTO> lovToJson(String qm_QUERY, String string, String string2);
+
 }

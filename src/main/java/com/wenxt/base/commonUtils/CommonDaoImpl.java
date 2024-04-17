@@ -112,4 +112,10 @@ public class CommonDaoImpl implements CommonDao {
 		return result;
 	}
 
+	@Override
+	public List<LovToJsonDTO> lovToJson(String qm_QUERY, String string, String string2) {
+		List<LovToJsonDTO> result = template.query(qm_QUERY, new Object[] {string, string2}, new BeanPropertyRowMapper<>(LovToJsonDTO.class));
+		return result;
+	}
+
 }
