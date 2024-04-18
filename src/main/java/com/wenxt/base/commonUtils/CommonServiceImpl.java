@@ -98,6 +98,9 @@ public class CommonServiceImpl implements CommonService {
 
 	@Value("${spring.lov.worngid}")
 	private String getLovWrongId;
+	
+	@Value("${get.user.byId}")
+	private String getUserById;
 
 	@Override
 	public String insertAudit(APP_AUDIT auditModel) {
@@ -382,7 +385,7 @@ public class CommonServiceImpl implements CommonService {
 		List<LM_PROG_FIELD_DEFN_NEW> result = commonDao.getFieldList(parametermap.get("screenCode").toString(),
 				parametermap.get("screenName").toString(), exeQuery.getQM_QUERY());
 		if (result.size() > 0) {
-			response.put("Header Info", headerInfo);
+			response.put("headerInfo", headerInfo);
 			result.stream().collect(
 					Collectors.toMap(x -> x.getPFD_COLUMN_NAME(), x -> x, (existing, replacement) -> existing));
 
@@ -421,10 +424,10 @@ public class CommonServiceImpl implements CommonService {
 					accordions.put(result.get(i).getPFD_FLD_NAME(), parseAccordion(result.get(i), result, request));
 				}
 			}
-			staticDetailsFormFields.put("Form_Fields", staticDetailsMap);
+			staticDetailsFormFields.put("formFields", staticDetailsMap);
 			response.put("Static_Details", staticDetailsFormFields);
-			frontFormFields.put("Form_Fields", frontFormMap);
-			response.put("Front_Form", frontFormFields);
+			frontFormFields.put("formFields", frontFormMap);
+			response.put("frontForm", frontFormFields);
 			response.put("Accordions", accordions);
 		}
 		return response.toString();
@@ -510,7 +513,7 @@ public class CommonServiceImpl implements CommonService {
 //						})
 						.collect(Collectors.toMap(LM_PROG_FIELD_DEFN_NEW::getPFD_COLUMN_NAME, Function.identity()));
 				resultFieldsMap.add(fieldsMap);
-				tabs.put("Form_Fields", fieldsMap);
+				tabs.put("formFields", fieldsMap);
 				fieldType.put(accordionFields.get(i).getPFD_FLD_NAME(), tabs);
 			} else if (accordionFields.get(i).getPFD_FORM_ITEM_TYPE1().equals("AccordionMrv")) {
 				RestTemplate restTemplate = new RestTemplate();
@@ -665,7 +668,7 @@ public class CommonServiceImpl implements CommonService {
 			JsonNode node = mapper
 					.readTree(new File(basePath + params.get("screenName") + "_" + params.get("serviceName") + ".json"));
 
-			String tableName = ((ObjectNode) node).get("Front_Form").get("Form_Fields").get("user_initial")
+			String tableName = ((ObjectNode) node).get("frontForm").get("formFields").get("user_initial")
 					.get("PFD_TABLE_NAME").toString();
 			LM_MENU_USERS users = commonDao.getTransactionData((String) params.get("tranId"),
 					tableName.substring(1, tableName.length() - 1));
@@ -676,18 +679,22 @@ public class CommonServiceImpl implements CommonService {
 				try {
 					value = field.get(users);
 					String fieldName = field.getName();
-					if (((ObjectNode) node).get("Front_Form").get("Form_Fields").get(fieldName) != null) {
-						innerNode = ((ObjectNode) node).get("Front_Form").get("Form_Fields").get(fieldName);
+					if (((ObjectNode) node).get("frontForm").get("formFields").get(fieldName) != null) {
+						innerNode = ((ObjectNode) node).get("frontForm").get("formFields").get(fieldName);
 						((ObjectNode) innerNode).putPOJO("PFD_FLD_VALUE", value);
-					} else if (((ObjectNode) node).get("Static_Details").get("Form_Fields").get(fieldName) != null) {
-						innerNode = ((ObjectNode) node).get("Front_Form").get("Form_Fields").get(fieldName);
+					} else if (((ObjectNode) node).get("Static_Details").get("formFields").get(fieldName) != null) {
+						innerNode = ((ObjectNode) node).get("Static_Details").get("formFields").get(fieldName);
 						((ObjectNode) innerNode).putPOJO("PFD_FLD_VALUE", value);
 					}
 				} catch (IllegalArgumentException | IllegalAccessException e) {
 					e.printStackTrace();
 				}
 			}
-			return node.toString();
+			JSONObject obj = new JSONObject(node.toString());
+			String resultString = node.toString();
+			result.put(statusCode, successCode);
+			result.put(dataCode, obj);
+			return result.toString();
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
 		} catch (JsonProcessingException e) {
