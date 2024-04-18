@@ -32,10 +32,10 @@ public interface CommonService {
 	
 	public void saveFieldDefJson(HttpServletRequest request);
 	
-	public void serviceToJson(HttpServletRequest request);
+	public String serviceToJson(HttpServletRequest request);
 
 	public String editFields(HttpServletRequest request);
 
-	public void lovToJson(HttpServletRequest request);
+	public String lovToJson(HttpServletRequest request);
 
 }

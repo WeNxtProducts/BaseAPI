@@ -101,6 +101,12 @@ public class CommonServiceImpl implements CommonService {
 	
 	@Value("${get.user.byId}")
 	private String getUserById;
+	
+	@Value("${spring.service.to.json}")
+	private String serviceToJSON;
+	
+	@Value("${spring.lov.to.json}")
+	private String LOVtoJSON;
 
 	@Override
 	public String insertAudit(APP_AUDIT auditModel) {
@@ -619,8 +625,9 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
-	public void serviceToJson(HttpServletRequest request) {
+	public String serviceToJson(HttpServletRequest request) {
 		AsyncDTO input = new AsyncDTO();
+		JSONObject response = new JSONObject();
 
 		Map<String, Object> params = processParamLOV(null, request);
 		input.setScreenCode((String) params.get("screenCode"));
@@ -644,14 +651,18 @@ public class CommonServiceImpl implements CommonService {
 			if (responseEntity.getStatusCode() == HttpStatus.OK) {
 				String serviceResponse = responseEntity.getBody();
 				bufferedWriter.write(serviceResponse);
+				response.put(statusCode, successCode);
+				response.put(messageCode, serviceToJSON);
+				bufferedWriter.close();
+				return response.toString();
 			} else {
-				throw new UsernameNotFoundException("JUST CHECK");
+				response.put(statusCode, errorCode);
+				return response.toString();
 			}
-
-			bufferedWriter.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return response.toString();
 	}
 
 	@Override
@@ -706,7 +717,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
-	public void lovToJson(HttpServletRequest request) {
+	public String lovToJson(HttpServletRequest request) {
 		JSONObject response = new JSONObject();
 		Map<String, Object> params = processParamLOV(null, request);
 		Map<String, List<LOVDTO>> resultMap = new HashMap<>();
@@ -724,13 +735,21 @@ public class CommonServiceImpl implements CommonService {
 				file.getParentFile().mkdirs();
 				FileWriter fileWriter = new FileWriter(file);
 				BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+				response.put(statusCode, successCode);
+				response.put(messageCode, LOVtoJSON);
 				response.put("Result", resultMap);
 				bufferedWriter.write(response.get("Result").toString());
 				bufferedWriter.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			response.remove("Result");
+			return response.toString();
+		}else {
+			response.put(statusCode, errorCode);
+			return response.toString();
 		}
+		
 	}
 
 }

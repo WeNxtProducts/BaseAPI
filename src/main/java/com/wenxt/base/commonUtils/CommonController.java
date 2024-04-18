@@ -90,8 +90,8 @@ public class CommonController {
 	}
 	
 	@PostMapping("/serviceToJson")
-	public void serviceToJson(HttpServletRequest request) {
-		service.serviceToJson(request);
+	public String serviceToJson(HttpServletRequest request) {
+		return service.serviceToJson(request);
 	}
 	
 	@PostMapping("/editFields")
@@ -100,8 +100,8 @@ public class CommonController {
 	}
 	
 	@GetMapping("/lovtoJson")
-	public void lovToJson(HttpServletRequest request) {
-		service.lovToJson(request);
+	public String lovToJson(HttpServletRequest request) {
+		return service.lovToJson(request);
 	}
 
 }
