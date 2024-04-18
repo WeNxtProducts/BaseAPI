@@ -711,7 +711,7 @@ public class CommonServiceImpl implements CommonService {
 		Map<String, Object> params = processParamLOV(null, request);
 		Map<String, List<LOVDTO>> resultMap = new HashMap<>();
 
-		String file_path = basePath + params.get("screenName") + "getLOVList.json";
+		String file_path = basePath + params.get("screenName") + "_getLOVList.json";
 		QUERY_MASTER query = commonDao.getQueryLov(18);
 		if (query != null) {
 			List<LovToJsonDTO> result = commonDao.lovToJson(query.getQM_QUERY(), params.get("screenCode").toString(),
