@@ -1,5 +1,7 @@
 package com.wenxt.base.userMaster;
 
+import java.time.LocalDateTime;
+
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,26 +41,25 @@ public class LM_MENU_USERS {
 	private String	user_tel_extn;
 	@Nullable
 	private String	user_fax_no;
-	@Nullable
-	private String	user_login_count;
+	
+	private Short	user_login_count;
 	@Nullable
 	private String	user_ext_yn;
 	@Nullable
 	private String	user_vps;
-	@Nullable
-	private String	user_copies;
+	
+	private Short	user_copies;
 	@Nullable
 	private String	user_prn_code;
 	@Nullable
 	private String	user_pf_code;
 	@Nullable
 	private String	user_override_yn;
-	@Nullable
-	private String	user_ins_Dt;
+	private LocalDateTime	user_ins_Dt;
 	@Nullable
 	private String	user_ins_id;
-	@Nullable
-	private String	user_mod_Dt;
+	
+	private LocalDateTime	user_mod_Dt;
 	@Nullable
 	private String	user_mod_id;
 	@Nullable
@@ -78,7 +79,7 @@ public class LM_MENU_USERS {
 	@Nullable
 	private String	user_remarks;
 	@Nullable
-	private String	user_expiry_day_count;
+	private Integer	user_expiry_day_count;
 	@Nullable
 	private String	user_passwd_expiry_yn;
 	@Nullable
@@ -138,7 +139,7 @@ public class LM_MENU_USERS {
 	@Nullable
 	private String	user_ds_group_id;
 	@Nullable
-	private String	user_pwd_reuse_count;
+	private Double	user_pwd_reuse_count;
 	@Nullable
 	private String	user_dflt_lang_code;
 	@Nullable
@@ -241,10 +242,12 @@ public class LM_MENU_USERS {
 	public void setUser_fax_no(String user_fax_no) {
 		this.user_fax_no = user_fax_no;
 	}
-	public String getUser_login_count() {
+	
+	
+	public Short getUser_login_count() {
 		return user_login_count;
 	}
-	public void setUser_login_count(String user_login_count) {
+	public void setUser_login_count(Short user_login_count) {
 		this.user_login_count = user_login_count;
 	}
 	public String getUser_ext_yn() {
@@ -259,10 +262,11 @@ public class LM_MENU_USERS {
 	public void setUser_vps(String user_vps) {
 		this.user_vps = user_vps;
 	}
-	public String getUser_copies() {
+	
+	public Short getUser_copies() {
 		return user_copies;
 	}
-	public void setUser_copies(String user_copies) {
+	public void setUser_copies(Short user_copies) {
 		this.user_copies = user_copies;
 	}
 	public String getUser_prn_code() {
@@ -283,22 +287,24 @@ public class LM_MENU_USERS {
 	public void setUser_override_yn(String user_override_yn) {
 		this.user_override_yn = user_override_yn;
 	}
-	public String getUser_ins_Dt() {
-		return user_ins_Dt;
-	}
-	public void setUser_ins_Dt(String user_ins_Dt) {
-		this.user_ins_Dt = user_ins_Dt;
-	}
+
 	public String getUser_ins_id() {
 		return user_ins_id;
 	}
 	public void setUser_ins_id(String user_ins_id) {
 		this.user_ins_id = user_ins_id;
 	}
-	public String getUser_mod_Dt() {
+	
+	public LocalDateTime getUser_ins_Dt() {
+		return user_ins_Dt;
+	}
+	public void setUser_ins_Dt(LocalDateTime user_ins_Dt) {
+		this.user_ins_Dt = user_ins_Dt;
+	}
+	public LocalDateTime getUser_mod_Dt() {
 		return user_mod_Dt;
 	}
-	public void setUser_mod_Dt(String user_mod_Dt) {
+	public void setUser_mod_Dt(LocalDateTime user_mod_Dt) {
 		this.user_mod_Dt = user_mod_Dt;
 	}
 	public String getUser_mod_id() {
@@ -362,10 +368,11 @@ public class LM_MENU_USERS {
 	public void setUser_remarks(String user_remarks) {
 		this.user_remarks = user_remarks;
 	}
-	public String getUser_expiry_day_count() {
+	
+	public Integer getUser_expiry_day_count() {
 		return user_expiry_day_count;
 	}
-	public void setUser_expiry_day_count(String user_expiry_day_count) {
+	public void setUser_expiry_day_count(Integer user_expiry_day_count) {
 		this.user_expiry_day_count = user_expiry_day_count;
 	}
 	public String getUser_passwd_expiry_yn() {
@@ -546,10 +553,11 @@ public class LM_MENU_USERS {
 	public void setUser_ds_group_id(String user_ds_group_id) {
 		this.user_ds_group_id = user_ds_group_id;
 	}
-	public String getUser_pwd_reuse_count() {
+	
+	public Double getUser_pwd_reuse_count() {
 		return user_pwd_reuse_count;
 	}
-	public void setUser_pwd_reuse_count(String user_pwd_reuse_count) {
+	public void setUser_pwd_reuse_count(Double user_pwd_reuse_count) {
 		this.user_pwd_reuse_count = user_pwd_reuse_count;
 	}
 	public String getUser_dflt_lang_code() {

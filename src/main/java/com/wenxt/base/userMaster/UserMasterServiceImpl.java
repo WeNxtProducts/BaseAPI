@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -166,19 +167,14 @@ public class UserMasterServiceImpl implements UserMasterService {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		try {
 			Map<String, String> formFields = requestData.getFrontForm().getFormFields();
-
-//          
-
 			String userInitial = formFields.get("user_initial");
 			String userRemarks = formFields.get("user_remarks");
 			String userId = formFields.get("user_id");
-
 			double userWarningDays = Double.parseDouble(formFields.get("user_warning_days"));
-//
 			String userLogonOption = formFields.get("user_logon_option");
-//          short userLoginCount = Short.parseShort(formFields.get("user_login_count"));
-			int userExpiryDayCount = Integer.parseInt(formFields.get("user_expiry_day_count"));
-//          String userLockedYN = formFields.get("user_locked_yn");
+			short userLoginCount = Short.parseShort(formFields.get("user_login_count"));
+			Integer userExpiryDayCount = Integer.parseInt(formFields.get("user_expiry_day_count"));
+			String userLockedYN = formFields.get("user_locked_yn");
 			double userPwdReuseCount = Double.parseDouble(formFields.get("user_pwd_reuse_count"));
 //          LocalDateTime userExpiryDt = LocalDateTime.parse(formFields.get("user_expiry_dt"), formatter);
 			String userEmailId = formFields.get("user_email_id");
@@ -186,8 +182,9 @@ public class UserMasterServiceImpl implements UserMasterService {
 			String userTelNo = formFields.get("user_tel_no");
 			String userPasswd = formFields.get("user_passwd");
 			String userPasswdExpiryYN = formFields.get("user_passwd_expiry_yn");
-//          char userAdministratorYN = formFields.get("user_administrator_yn").charAt(0);
+			String userAdministratorYN = formFields.get("user_administrator_yn");
 			String userOverrideYN = formFields.get("user_override_yn");
+			short userCopies = Short.parseShort(formFields.get("user_copies"));
 //          short userCopies = Short.parseShort(formFields.get("user_copies"));
 			String userDsGroupId = formFields.get("user_ds_group_id");
 
@@ -197,10 +194,10 @@ public class UserMasterServiceImpl implements UserMasterService {
 			newUser.setUserId(userId);
 			newUser.setUser_warning_days(userWarningDays);
 			newUser.setUser_logon_option(userLogonOption);
-//          newUser.setUserLoginCount(userLoginCount);
-//          newUser.setUserExpiryDayCount(userExpiryDayCount);
-//          newUser.setUserLockedYn(userLockedYN);
-//          newUser.setUser_pwd_reuse_count(userPwdReuseCount);
+			newUser.setUser_login_count(userLoginCount);
+			newUser.setUser_expiry_day_count(userExpiryDayCount);
+			newUser.setUser_locked_yn(userLockedYN);
+			newUser.setUser_pwd_reuse_count(userPwdReuseCount);
 //          newUser.setUser_expiry_dt(userExpiryDt);
 			newUser.setUserEmailId(userEmailId);
 			newUser.setUser_mobile_no(userMobileNo);
@@ -209,24 +206,58 @@ public class UserMasterServiceImpl implements UserMasterService {
 			newUser.setUser_passwd(encryptor.encrypt(userPasswd));
 
 			newUser.setUser_passwd_expiry_yn(userPasswdExpiryYN);
-//          newUser.setUserAdministratorYn(userAdministratorYN);
+			newUser.setUser_administrator_yn(userAdministratorYN);
 			newUser.setUser_override_yn(userOverrideYN);
-//          newUser.setUserCopies(userCopies);
+			newUser.setUser_copies(userCopies);
 			newUser.setUser_ds_group_id(userDsGroupId);
 
+			LocalDateTime currentDate = LocalDateTime.now();
+//			newUser.setUser_ins_Dt(currentDate);
+
+			newUser.setUser_ds_group_id(userDsGroupId);
+//			Optional<LM_MENU_USERS> optionalUser = userrepo.findById(newUser.getUserId());
+//			if (optionalUser.isPresent()) {
+//				LM_MENU_USERS existingUser = optionalUser.get();
+//
+//				newUser.setUser_mod_Dt(currentDate);
+//				userrepo.save(newUser);
+//				response.put("Status", "SUCCESS");
+//				response.put("Message", "User information updated successfully");
+//				data.put("Id", existingUser.getUserId());
+//			} else {
+//				
+//				
+//				newUser.setUser_ins_Dt(currentDate);
+//				LM_MENU_USERS savedUser = userrepo.save(newUser);
+//
+//				response.put("Status", "SUCCESS");
+//				response.put("Message", "User created successfully");
+//				data.put("Id", savedUser.getUserId());
+//			}
+
 			Optional<LM_MENU_USERS> optionalUser = userrepo.findById(newUser.getUserId());
+
 			if (optionalUser.isPresent()) {
-				LM_MENU_USERS existingUser = optionalUser.get();
-				userrepo.save(newUser);
-				response.put("Status", "SUCCESS");
-				response.put("Message", "User information updated successfully");
-				data.put("Id", existingUser.getUserId());
+			    LM_MENU_USERS existingUser = optionalUser.get();
+
+			    // Keep the existing user_ins_Dt value
+			    if (existingUser.getUser_ins_Dt() != null) {
+			        newUser.setUser_ins_Dt(existingUser.getUser_ins_Dt());
+			    }
+			    
+			    newUser.setUser_mod_Dt(currentDate);
+			    userrepo.save(newUser);
+			    response.put("Status", "SUCCESS");
+			    response.put("Message", "User information updated successfully");
+			    data.put("Id", existingUser.getUserId());
 			} else {
-				// Save the new user
-				LM_MENU_USERS savedUser = userrepo.save(newUser);
-				response.put("Status", "SUCCESS");
-				response.put("Message", "User created successfully");
-				data.put("Id", savedUser.getUserId());
+			    // Set user_ins_Dt only when user is created
+			    newUser.setUser_ins_Dt(currentDate);
+			    LM_MENU_USERS savedUser = userrepo.save(newUser);
+
+			    response.put("Status", "SUCCESS");
+			    response.put("Message", "User created successfully");
+			    data.put("Id", savedUser.getUserId());
 			}
 
 			response.put("Data", data);
