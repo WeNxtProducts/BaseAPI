@@ -245,14 +245,17 @@ public class UserMasterServiceImpl implements UserMasterService {
 			        newUser.setUser_ins_Dt(existingUser.getUser_ins_Dt());
 			    }
 			    
+			    newUser.setUser_ins_id(existingUser.getUserId());
 			    newUser.setUser_mod_Dt(currentDate);
 			    userrepo.save(newUser);
 			    response.put("Status", "SUCCESS");
 			    response.put("Message", "User information updated successfully");
 			    data.put("Id", existingUser.getUserId());
 			} else {
+//				 LM_MENU_USERS User = optionalUser.get();
 			    // Set user_ins_Dt only when user is created
 			    newUser.setUser_ins_Dt(currentDate);
+			    newUser.setUser_mod_id(newUser.getUserId());
 			    LM_MENU_USERS savedUser = userrepo.save(newUser);
 
 			    response.put("Status", "SUCCESS");
