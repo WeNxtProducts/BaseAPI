@@ -1,15 +1,8 @@
 package com.wenxt.base.login;
 
-import java.util.Map;
-
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,10 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.wenxt.base.security.AuthRequest;
 import com.wenxt.base.security.JwtService;
 
-import io.swagger.v3.oas.models.media.MediaType;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
@@ -36,8 +27,8 @@ public class LoginController {
 	@Autowired
 	private JwtService jwtService;
 
-	@Autowired
-	private AuthenticationManager authenticationManager;
+//	@Autowired
+//	private AuthenticationManager authenticationManager;
 
 	@PostMapping("/login")
 	public String login(@RequestBody LoginRequestModel login) {
@@ -101,9 +92,14 @@ public class LoginController {
 		}
 	}
 
-	
-	 @GetMapping("/password_view")
-	    public String password(@RequestParam String username,@RequestParam String password,String userId){
-	        return loginService.password(username, password,userId);
-	    }
+	@GetMapping("/password_view")
+	public String password(@RequestParam String username, @RequestParam String password, String userId) {
+		return loginService.password(username, password, userId);
+	}
+
+	@PostMapping("/getCompyByuser")
+	public String getAllcompanyListByuser(@RequestBody LoginDropDownRequestModel user) {
+		return loginService.getAllcompanyListByuser(user);
+	}
+
 }

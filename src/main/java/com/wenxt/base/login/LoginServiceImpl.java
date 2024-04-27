@@ -185,7 +185,7 @@ public class LoginServiceImpl implements LoginService {
 		List<LOVDTO> list = new ArrayList<>();
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject obj = jsonArray.getJSONObject(i);
-			LOVDTO model = new LOVDTO(obj.get("label"), obj.get("value")); // Assuming model structure
+			LOVDTO model = new LOVDTO(obj.get("Label"), obj.get("value")); // Assuming model structure
 			list.add(model);
 		}
 		response.put(statusCode, successCode);
@@ -512,53 +512,109 @@ public class LoginServiceImpl implements LoginService {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response.toString());
 		}
 	}
+
 	@Override
 	public String password(String username, String password, String userId) {
-	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	    JSONObject response = new JSONObject();
-	    Map<String, Object> data = new HashMap<>();
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		JSONObject response = new JSONObject();
+		Map<String, Object> data = new HashMap<>();
 
-	    if (authentication != null && authentication.isAuthenticated()) {
-	        String jwtUser = authentication.getName();
+		if (authentication != null && authentication.isAuthenticated()) {
+			String jwtUser = authentication.getName();
 
-	        if ("ADMIN".equals(username) && "ADMIN".equals(jwtUser)) {
-	            // Assuming userrepo is a repository for user data
-	            List<LM_MENU_USERS> userList = userrepo.findAll();
+			if ("ADMIN".equals(username) && "ADMIN".equals(jwtUser)) {
+				// Assuming userrepo is a repository for user data
+				List<LM_MENU_USERS> userList = userrepo.findAll();
 
-	            // Find the user by userId
-	            Optional<LM_MENU_USERS> userOptional = userList.stream()
-	                    .filter(user -> userId.equals(user.getUserId()))
-	                    .findFirst();
+				// Find the user by userId
+				Optional<LM_MENU_USERS> userOptional = userList.stream().filter(user -> userId.equals(user.getUserId()))
+						.findFirst();
 
-	            if (userOptional.isPresent()) {
-	                LM_MENU_USERS user = userOptional.get();
-	                String encryptedPassword = user.getUser_passwd();
-	                String decryptedPassword = encryptor.decrypt(encryptedPassword);
+				if (userOptional.isPresent()) {
+					LM_MENU_USERS user = userOptional.get();
+					String encryptedPassword = user.getUser_passwd();
+					String decryptedPassword = encryptor.decrypt(encryptedPassword);
 
-	                // Verify admin password
-	                if (password.equals("Test@123")) {
-	                    data.put("UserID", user.getUserId());
-	                    data.put("Password", decryptedPassword);
-	                    response.put("Status", "SUCCESS");
-	                    response.put("status_msg", "Password retrieved successfully");
-	                    response.put("Data", data);
-	                } else {
-	                    response.put("Status", "FAILURE");
-	                    response.put("status_msg", "Invalid admin password");
-	                }
-	            } else {
-	                response.put("Status", "FAILURE");
-	                response.put("status_msg", "User not found");
-	            }
-	        } else {
-	            response.put("Status", "FAILURE");
-	            response.put("status_msg", "Invalid user");
-	        }
-	    } else {
-	        response.put("Status", "FAILURE");
-	        response.put("status_msg", "User not authenticated");
-	    }
+					// Verify admin password
+					if (password.equals("Test@123")) {
+						data.put("UserID", user.getUserId());
+						data.put("Password", decryptedPassword);
+						response.put("Status", "SUCCESS");
+						response.put("status_msg", "Password retrieved successfully");
+						response.put("Data", data);
+					} else {
+						response.put("Status", "FAILURE");
+						response.put("status_msg", "Invalid admin password");
+					}
+				} else {
+					response.put("Status", "FAILURE");
+					response.put("status_msg", "User not found");
+				}
+			} else {
+				response.put("Status", "FAILURE");
+				response.put("status_msg", "Invalid user");
+			}
+		} else {
+			response.put("Status", "FAILURE");
+			response.put("status_msg", "User not authenticated");
+		}
 
-	    return response.toString();
+		return response.toString();
 	}
+
+	@Override
+	public String getAllcompanyListByuser(LoginDropDownRequestModel user) {
+
+		JSONObject response = new JSONObject();
+		RestTemplate restTemplate = new RestTemplate();
+		String url = getBaseURL + "common/getparamlov?queryId=20&muc_user_id= muc_user_id";
+		ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
+		if (responseEntity.getStatusCode() == HttpStatus.OK) {
+			String serviceResponse = responseEntity.getBody();
+		} else {
+			throw new UsernameNotFoundException("JUST CHECK");
+		}
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject = new JSONObject(responseEntity.getBody().toString());
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		JSONArray jsonArray = (JSONArray) jsonObject.get("Data");
+		List<LOVDTO> list = new ArrayList<>();
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject obj = jsonArray.getJSONObject(i);
+			LOVDTO model = new LOVDTO(obj.get("label"), obj.get("value")); // Assuming model structure
+			list.add(model);
+		}
+
+		user.setCompanyCodes(list);
+		KieSession kieSession = kieContainer.newKieSession();
+
+		try {
+			kieSession.insert(user);
+			kieSession.fireAllRules();
+		} finally {
+			kieSession.dispose();
+		}
+
+		if (user.getErrorMessage() == null) {
+			response.put(statusCode, successCode);
+			response.put(messageCode, getCompanyMessage);
+			response.put(dataCode, list);
+			return response.toString();
+		} else {
+			List<Map<String, String>> errorList = new ArrayList<>();
+			Map<String, String> errorMap = new LinkedHashMap<String, String>();
+			response.put(statusCode, errorCode);
+			response.put(messageCode, "Validation Error");
+			errorMap.put("Field", user.getErrorField());
+			errorMap.put(messageCode, user.getErrorMessage());
+			errorList.add(errorMap);
+			response.put("Error", errorList);
+			return response.toString();
+		}
+
+	}
+
 }

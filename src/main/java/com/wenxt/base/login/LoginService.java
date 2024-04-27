@@ -2,8 +2,6 @@ package com.wenxt.base.login;
 
 import org.springframework.http.ResponseEntity;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 public interface LoginService {
 
 	public String getCompany(LoginDropDownRequestModel user);
@@ -25,5 +23,6 @@ public interface LoginService {
 
 	public String password(String username, String password, String userId);
 
+	public String getAllcompanyListByuser(LoginDropDownRequestModel user);
 
 }
