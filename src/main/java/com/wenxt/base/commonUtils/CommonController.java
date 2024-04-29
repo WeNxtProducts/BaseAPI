@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.UriInfo;
@@ -71,7 +70,12 @@ public class CommonController {
 	
 	@GetMapping("/getfield")
 	public String getFieldList(HttpServletRequest request) {
-		return service.getFieldList(request);
+		try {
+			return service.getFieldList(request);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			return e.getMessage();
+		}
 	}
 	
 	@PostMapping("/runasyncservice")
@@ -96,12 +100,42 @@ public class CommonController {
 	
 	@PostMapping("/editFields")
 	public String editFields(HttpServletRequest request) {
-		return service.editFields(request);
+		return service.editFields(request, new JSONObject());
 	}
 	
 	@GetMapping("/lovtoJson")
 	public String lovToJson(HttpServletRequest request) {
 		return service.lovToJson(request);
+	}
+	
+	@GetMapping("/quotationEdit")
+	public String quotationMaster(HttpServletRequest request) {
+		try {
+		return service.quotationEdit(request);
+		}catch(Exception e) {
+			e.printStackTrace();
+			return e.getMessage();
+		}
+	}
+	
+	@GetMapping("/userEdit")
+	public String userMasterEdit(HttpServletRequest request) {
+		try {
+			return service.userMasterEdit(request);
+			}catch(Exception e) {
+				e.printStackTrace();
+				return e.getMessage();
+			}
+	}
+	
+	@GetMapping("/customerEdit")
+	public String customerMasterEdit(HttpServletRequest request) {
+		try {
+			return service.customerMasterEdit(request);
+			}catch(Exception e) {
+				e.printStackTrace();
+				return e.getMessage();
+			}
 	}
 
 }

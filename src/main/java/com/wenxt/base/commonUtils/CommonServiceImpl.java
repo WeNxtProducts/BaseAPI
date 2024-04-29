@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -30,16 +31,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.wenxt.base.userMaster.LM_MENU_USERS;
 
 import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.UserAgent;
+import jakarta.persistence.Column;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Service
@@ -377,64 +374,96 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
-	public String getFieldList(HttpServletRequest request) {
+	public String getFieldList(HttpServletRequest request) throws IllegalArgumentException, IllegalAccessException {
 		JSONObject response = new JSONObject();
 		JSONObject headerInfo = new JSONObject();
 		JSONObject staticDetailsFormFields = new JSONObject();
 		JSONObject frontFormFields = new JSONObject();
 		JSONObject accordions = new JSONObject();
+		Character isEditFlag = 'N';
 
 		Map<String, Object> parametermap = processParamLOV(null, request);
 
 		QUERY_MASTER exeQuery = commonDao.getQueryLov(16);
+		JSONObject accordionResponse = new JSONObject();
+		Map<String, Object> transMap = new HashMap<>();
 
 		List<LM_PROG_FIELD_DEFN_NEW> result = commonDao.getFieldList(parametermap.get("screenCode").toString(),
 				parametermap.get("screenName").toString(), exeQuery.getQM_QUERY());
 		if (result.size() > 0) {
+			
+			if(parametermap.get("tranId") != null) {
+			String tranId = (String) parametermap.get("tranId");
+			LM_MENU_USERS users = commonDao.getTransactionData(tranId, "lm_menu_users");
+			  Class<?> clazz = users.getClass();
+			  String columnName = null;
+			  for (Field field : clazz.getDeclaredFields()) {
+			    field.setAccessible(true); // Allow access to private fields
+			    if (field.isAnnotationPresent(Column.class)) {
+					Annotation annotation = field.getAnnotation(Column.class);
+					Column column = (Column) annotation;
+
+					columnName = column.name();
+				}
+			    String fieldName = columnName;
+			    Object fieldValue = field.get(users);
+			    transMap.put(fieldName, fieldValue);
+			  }
+			isEditFlag ='Y';
+			}
 			response.put("headerInfo", headerInfo);
 			result.stream().collect(
 					Collectors.toMap(x -> x.getPFD_COLUMN_NAME(), x -> x, (existing, replacement) -> existing));
 
 			Map<String, LM_PROG_FIELD_DEFN_NEW> staticDetailsMap = new LinkedHashMap<>();
 			Map<String, LM_PROG_FIELD_DEFN_NEW> frontFormMap = new LinkedHashMap<>();
+			Map<String, Object> innerMap = new HashMap<>();
 
 			for (int i = 0; i < result.size(); i++) {
 				if (result.get(i).getPFD_FORM_ITEM_TYPE1().equals("Static")) {
+					if(isEditFlag == 'Y') {
+						result.get(i).setPFD_FLD_VALUE(transMap.get(result.get(i).getPFD_COLUMN_NAME()));
+						staticDetailsMap.put(result.get(i).getPFD_COLUMN_NAME(), result.get(i));
+					}
 					staticDetailsMap.put(result.get(i).getPFD_COLUMN_NAME(), result.get(i));
 				} else if (result.get(i).getPFD_FORM_ITEM_TYPE1().equals("FrontForm")) {
 					frontFormFields.put("Label", result.get(i).getPFD_FLD_NAME());
+					if(isEditFlag.equals('Y')) {
+						System.out.println("IN");
+						Map<String, Object> innerTransMap = transMap;
+						frontFormMap = result.stream()
+								.filter(item -> item.getPFD_FORM_ITEM_TYPE1().equals("FrontFormField"))
+								.peek(item -> {
+									item.setPFD_FLD_VALUE(innerTransMap.get(item.getPFD_COLUMN_NAME()));
+								})
+								.collect(Collectors.toMap(LM_PROG_FIELD_DEFN_NEW::getPFD_COLUMN_NAME, Function.identity()));
+					}
 					frontFormMap = result.stream()
 							.filter(item -> item.getPFD_FORM_ITEM_TYPE1().equals("FrontFormField"))
-//							.peek(item -> {
-//								if (item.getPFD_DATA_TYPE() != null && item.getPFD_DATA_TYPE().equals("lov")
-//										|| item.getPFD_DATA_TYPE() != null
-//												&& item.getPFD_DATA_TYPE().equals("searchlov")) {
-//									QUERY_MASTER query = commonDao.getQueryLov(Integer.parseInt(item.getPFD_PARAM_1()));
-//									List<LOVDTO> list = commonDao.executeLOVQuery(query.getQM_QUERY(), null);
-//									item.setOptions(list);
-//								} else 
-//									if (item.getPFD_DATA_TYPE() != null
-//										&& item.getPFD_DATA_TYPE().equals("paramlov")) {
-//									QUERY_MASTER query = commonDao.getQueryLov(Integer.parseInt(item.getPFD_PARAM_1()));
-//									List<QUERY_PARAM_MASTER> queryParams = commonDao
-//											.getQueryParams(query.getQM_SYS_ID());
-//									Map<String, Object> processedParams = processParamLOV(queryParams, request);
-//									List<LOVDTO> list = commonDao.executeLOVQuery(query.getQM_QUERY(), processedParams);
-//									item.setOptions(list);
-//								}
-//							})
 							.collect(Collectors.toMap(LM_PROG_FIELD_DEFN_NEW::getPFD_COLUMN_NAME, Function.identity()));
 				} else if (result.get(i).getPFD_FORM_ITEM_TYPE1().equals("AccordionHeader")) {
-					JSONObject accordionResponse = new JSONObject();
+					String accordionName = result.get(i).getPFD_FLD_NAME();
+					accordionResponse = new JSONObject();
 					accordionResponse.put("Label", result.get(i).getPFD_FLD_NAME());
-					accordions.put(result.get(i).getPFD_FLD_NAME(), parseAccordion(result.get(i), result, request));
+					Map<String, Object> fieldsMap = new HashMap<>();
+					fieldsMap = result.stream()
+							.filter(item -> item.getPFD_FORM_ITEM_TYPE2() != null && item.getPFD_FORM_ITEM_TYPE2().equals(accordionName)
+							&& !item.getPFD_FORM_ITEM_TYPE1().equals("AccordionTab"))
+							.collect(Collectors.toMap(LM_PROG_FIELD_DEFN_NEW::getPFD_COLUMN_NAME, Function.identity()));
+					if(fieldsMap.size() <= 0) {
+					accordionResponse.put(result.get(i).getPFD_FLD_NAME(), parseAccordion(result.get(i), result, request));
+					}else {
+						JSONObject object = new JSONObject();
+						accordionResponse.put("formFields", fieldsMap);
+					}
+					innerMap.put(result.get(i).getPFD_FLD_NAME(), accordionResponse);
 				}
 			}
 			staticDetailsFormFields.put("formFields", staticDetailsMap);
-			response.put("Static_Details", staticDetailsFormFields);
+			response.put("static_details", staticDetailsFormFields);
 			frontFormFields.put("formFields", frontFormMap);
 			response.put("frontForm", frontFormFields);
-			response.put("Accordions", accordions);
+			response.put("accordions", innerMap);
 		}
 		return response.toString();
 	}
@@ -485,8 +514,8 @@ public class CommonServiceImpl implements CommonService {
 		JSONObject fieldType = new JSONObject();
 		JSONObject tabs = new JSONObject();
 		String typeOfAccordion = "";
-		Map<String, LM_PROG_FIELD_DEFN_NEW> fieldsMap = new LinkedHashMap<>();
-		List<Map<String, LM_PROG_FIELD_DEFN_NEW>> resultFieldsMap = new ArrayList<>();
+		Map<String, Object> fieldsMap = new LinkedHashMap<>();
+		List<Map<String, Object>> resultFieldsMap = new ArrayList<>();
 		List<LM_PROG_FIELD_DEFN_NEW> accordionFields = result.stream()
 				.filter(object -> object.getPFD_FORM_ITEM_TYPE2() != null
 						&& object.getPFD_FORM_ITEM_TYPE2().equals(input.getPFD_FLD_NAME()))
@@ -500,28 +529,43 @@ public class CommonServiceImpl implements CommonService {
 				String accordionFieldName = accordionFields.get(i).getPFD_FLD_NAME();
 				List<LM_PROG_FIELD_DEFN_NEW> accordFieldsList = result.stream()
 						.filter(object -> object.getPFD_FORM_ITEM_TYPE2() != null
-								&& object.getPFD_FORM_ITEM_TYPE2().equals(accordionFieldName))
+								&& object.getPFD_FORM_ITEM_TYPE2().equals(accordionFieldName)
+								&& !object.getPFD_FORM_ITEM_TYPE1().equals("AccordionTab"))
 						.collect(Collectors.toList());
+				if(accordFieldsList.size() > 0) {
 				fieldsMap = accordFieldsList.stream()
-						.filter(item -> item.getPFD_FORM_ITEM_TYPE2().equals(accordionFieldName))
-//						.peek(item -> {
-//							if (item.getPFD_DATA_TYPE() != null && item.getPFD_DATA_TYPE().equals("lov")) {
-//								QUERY_MASTER query = commonDao.getQueryLov(Integer.parseInt(item.getPFD_PARAM_1()));
-//								List<LOVDTO> list = commonDao.executeLOVQuery(query.getQM_QUERY(), null);
-//								item.setOptions(list);
-//							} else if (item.getPFD_DATA_TYPE() != null && item.getPFD_DATA_TYPE().equals("paramlov")) {
-//								QUERY_MASTER query = commonDao.getQueryLov(Integer.parseInt(item.getPFD_PARAM_1()));
-//								List<QUERY_PARAM_MASTER> queryParams = commonDao.getQueryParams(query.getQM_SYS_ID());
-//								Map<String, Object> processedParams = processParamLOV(queryParams, request);
-//								List<LOVDTO> list = commonDao.executeLOVQuery(query.getQM_QUERY(), processedParams);
-//								item.setOptions(list);
-//							}
-//						})
+						.filter(item -> item.getPFD_FORM_ITEM_TYPE2().equals(accordionFieldName) && !item.getPFD_FORM_ITEM_TYPE1().equals("AccordionTab"))
 						.collect(Collectors.toMap(LM_PROG_FIELD_DEFN_NEW::getPFD_COLUMN_NAME, Function.identity()));
 				resultFieldsMap.add(fieldsMap);
 				tabs.put("formFields", fieldsMap);
 				fieldType.put(accordionFields.get(i).getPFD_FLD_NAME(), tabs);
-			} else if (accordionFields.get(i).getPFD_FORM_ITEM_TYPE1().equals("AccordionMrv")) {
+				}else {
+					accordFieldsList = result.stream()
+							.filter(object -> object.getPFD_FORM_ITEM_TYPE2() != null
+									&& object.getPFD_FORM_ITEM_TYPE2().equals(accordionFieldName))
+							.collect(Collectors.toList());
+					Map<String, Object> innerMap = new HashMap<>();
+					for(int k=0; k<accordFieldsList.size(); k++) {
+						String inneraccordionFieldName = accordFieldsList.get(k).getPFD_FLD_NAME();
+						List<LM_PROG_FIELD_DEFN_NEW> inneraccordFieldsList = result.stream()
+								.filter(object -> object.getPFD_FORM_ITEM_TYPE2() != null
+										&& object.getPFD_FORM_ITEM_TYPE2().equals(inneraccordionFieldName)
+										&& !object.getPFD_FORM_ITEM_TYPE1().equals("AccordionTab"))
+								.collect(Collectors.toList());
+						fieldsMap = inneraccordFieldsList.stream()
+								.filter(item -> item.getPFD_FORM_ITEM_TYPE2().equals(inneraccordionFieldName))
+								.collect(Collectors.toMap(LM_PROG_FIELD_DEFN_NEW::getPFD_COLUMN_NAME, Function.identity()));
+						JSONObject innerObject = new JSONObject();
+						innerObject.put("formFields", fieldsMap);
+						innerObject.put("Label", inneraccordionFieldName);
+						innerMap.put(inneraccordionFieldName, innerObject);
+					}
+					resultFieldsMap.add(fieldsMap);
+					tabs.put("tabs", innerMap);
+					fieldType.put(accordionFieldName, tabs);
+				}
+			} 
+			else if (accordionFields.get(i).getPFD_FORM_ITEM_TYPE1().equals("AccordionMrv")) {
 				RestTemplate restTemplate = new RestTemplate();
 				String url = getBaseURL + "common/getMrvListing?queryId=" + accordionFields.get(i).getPFD_SEQ_NO() + "&"
 						+ request.getQueryString();
@@ -546,7 +590,7 @@ public class CommonServiceImpl implements CommonService {
 			}
 		}
 		if (typeOfAccordion.equals("AccordionTab")) {
-			response.put("Tabs", fieldType);
+			response.put("tabs", fieldType);
 		} else if (typeOfAccordion.equals("AccordionForm")) {
 			response.put("Forms", fieldType);
 		} else if (typeOfAccordion.equals("AccordionMrv")) {
@@ -645,9 +689,13 @@ public class CommonServiceImpl implements CommonService {
 			FileWriter fileWriter = new FileWriter(file);
 			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 			RestTemplate restTemplate = new RestTemplate();
+			JSONObject jsonObject = new JSONObject();
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			HttpEntity<String> requestEntity = new HttpEntity<>(jsonObject.toString(), headers);
 			String url = getBaseURL + object.getserv_url() + "?" + "screenCode=" + params.get("screenCode")
 					+ "&screenName=" + params.get("screenName");
-			ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, requestEntity, String.class);
 			if (responseEntity.getStatusCode() == HttpStatus.OK) {
 				String serviceResponse = responseEntity.getBody();
 				bufferedWriter.write(serviceResponse);
@@ -665,56 +713,78 @@ public class CommonServiceImpl implements CommonService {
 		return response.toString();
 	}
 
-	@Override
-	public String editFields(HttpServletRequest request) {
-		JSONObject result = new JSONObject();
-		ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
-		Map<String, Object> params = processParamLOV(null, request);
-		try {
-//			Map<String, Object> test;
-//				test = mapper.readValue(new File("D:\\Common_getFieldList.json"), 
-//							new TypeReference<Map<String, Object>>() {});
-//		 	List<LM_PROG_FIELD_DEFN_NEW> object = commonDao.getFrontFormDetails(); 
-			JsonNode innerNode = null;
-			JsonNode node = mapper
-					.readTree(new File(basePath + params.get("screenName") + "_" + params.get("serviceName") + ".json"));
-
-			String tableName = ((ObjectNode) node).get("frontForm").get("formFields").get("user_initial")
-					.get("PFD_TABLE_NAME").toString();
-			LM_MENU_USERS users = commonDao.getTransactionData((String) params.get("tranId"),
-					tableName.substring(1, tableName.length() - 1));
-			for (int i = 0; i < users.getClass().getDeclaredFields().length; i++) {
-				Field field = users.getClass().getDeclaredFields()[i];
-				field.setAccessible(true);
-				Object value;
-				try {
-					value = field.get(users);
-					String fieldName = field.getName();
-					if (((ObjectNode) node).get("frontForm").get("formFields").get(fieldName) != null) {
-						innerNode = ((ObjectNode) node).get("frontForm").get("formFields").get(fieldName);
-						((ObjectNode) innerNode).putPOJO("PFD_FLD_VALUE", value);
-					} else if (((ObjectNode) node).get("Static_Details").get("formFields").get(fieldName) != null) {
-						innerNode = ((ObjectNode) node).get("Static_Details").get("formFields").get(fieldName);
-						((ObjectNode) innerNode).putPOJO("PFD_FLD_VALUE", value);
-					}
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					e.printStackTrace();
-				}
-			}
-			JSONObject obj = new JSONObject(node.toString());
-			String resultString = node.toString();
-			result.put(statusCode, successCode);
-			result.put(dataCode, obj);
-			return result.toString();
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-		} catch (JsonProcessingException e) {
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return dataCode;
-
-	}
+//	@Override
+//	public String editFields(HttpServletRequest request) {
+//		JSONObject result = new JSONObject();
+//		ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+//		Map<String, Object> params = processParamLOV(null, request);
+//		try {
+//			JsonNode innerNode = null;
+//			JsonNode node = mapper.readTree(
+//					new File(basePath + params.get("screenName") + "_" + params.get("serviceName") + ".json"));
+//
+//			JsonNode formFields = ((ObjectNode) node).get("frontForm").get("formFields");
+//
+//			String firstFieldName = formFields.fieldNames().next();
+//
+//			String tableName = formFields.get(firstFieldName).get("PFD_TABLE_NAME").toString();
+//			Object users = commonDao.getTransactionData((String) params.get("tranId"),
+//					tableName.substring(1, tableName.length() - 1));
+//			tableName = tableName.replaceAll("^\"|\"$", ""); 			
+//			Class classs = null;
+//			try {
+//				classs = Class.forName("com.wenxt.base.commonUtils."+tableName.toString());
+//				lt_policy policy;
+//					policy = (lt_policy) classs.newInstance();
+//				System.out.println(policy.getpol_addl_status());
+//			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			System.out.println(classs);
+//			for (int i = 0; i < users.getClass().getDeclaredFields().length; i++) {
+//				Field field = users.getClass().getDeclaredFields()[i];
+//				field.setAccessible(true);
+//				String columnName = null;
+//				if (field.isAnnotationPresent(Column.class)) {
+//					Annotation annotation = field.getAnnotation(Column.class);
+//					Column column = (Column) annotation;
+//
+//					columnName = column.name();
+//				}
+//				Object value;
+//				try {
+//					value = field.get(users);
+//					String fieldName = field.getName();
+//					if (((ObjectNode) node).get("frontForm").get("formFields").get(columnName) != null) {
+////						System.out.println(field.getName() + value);
+//						innerNode = ((ObjectNode) node).get("frontForm").get("formFields").get(columnName);
+//						((ObjectNode) innerNode).putPOJO("PFD_FLD_VALUE", value);
+//					} else if (((ObjectNode) node).get("static_details").get("formFields").get(columnName) != null) {
+//						innerNode = ((ObjectNode) node).get("Static_Details").get("formFields").get(columnName);
+//						((ObjectNode) innerNode).putPOJO("PFD_FLD_VALUE", value);
+//					} else if (((ObjectNode) node).get("accordions").get("formFields").get(columnName) != null) {
+//						innerNode = ((ObjectNode) node).get("accordions").get("formFields").get(columnName);
+//						((ObjectNode) innerNode).putPOJO("PFD_FLD_VALUE", value);
+//					}
+//				} catch (IllegalArgumentException | IllegalAccessException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			JSONObject obj = new JSONObject(node.toString());
+//			String resultString = node.toString();
+//			result.put(statusCode, successCode);
+//			result.put(dataCode, obj);
+//			return result.toString();
+//		} catch (JsonMappingException e) {
+//			e.printStackTrace();
+//		} catch (JsonProcessingException e) {
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		return dataCode;
+//
+//	}
 
 	@Override
 	public String lovToJson(HttpServletRequest request) {
@@ -750,6 +820,260 @@ public class CommonServiceImpl implements CommonService {
 			return response.toString();
 		}
 		
+	}
+	
+	@Override
+	public String editFields(HttpServletRequest request, JSONObject object) {
+
+		JSONObject response = new JSONObject();
+		JSONObject headerInfo = new JSONObject();
+		JSONObject staticDetailsFormFields = new JSONObject();
+		JSONObject frontFormFields = new JSONObject();
+		JSONObject accordions = new JSONObject();
+		Character isEditFlag = 'N';
+		boolean JSONempty = object.isEmpty();
+		Map<String, Object> parametermap = processParamLOV(null, request);
+
+//		QUERY_MASTER exeQuery = commonDao.getQueryLov(16);
+		JSONObject accordionResponse = new JSONObject();
+
+		List<LM_HEADER_INFO_FLD_DEFN> headerInfoResult = commonDao.getHeaderInfoList(
+				parametermap.get("screenCode").toString(), parametermap.get("screenName").toString());
+
+		if(JSONempty == true) {
+		Map<String, Object> headerFieldsMap = headerInfoResult.stream()
+				.collect(Collectors.toMap(LM_HEADER_INFO_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+		headerInfo.put("formFields", headerFieldsMap);
+		response.put("headerInfo", headerInfo);
+		} else {
+			Map<String, Object> headerFieldsMap = headerInfoResult.stream()
+					.peek(item -> {
+						if(object.has(item.getPFD_COLUMN_NAME())) {
+						item.setPFD_FLD_VALUE(object.get(item.getPFD_COLUMN_NAME()));
+						}
+					})
+					.collect(Collectors.toMap(LM_HEADER_INFO_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+			headerInfo.put("formFields", headerFieldsMap);
+			response.put("headerInfo", headerInfo);
+		}
+
+		List<LM_STATIC_DETAILS_FLD_DEFN> staticDetailsResult = commonDao.getStaticDetailsList(
+				parametermap.get("screenCode").toString(), parametermap.get("screenName").toString());
+		if(JSONempty == true) {
+		Map<String, Object> staticFieldsMap = staticDetailsResult.stream()
+				.collect(Collectors.toMap(LM_STATIC_DETAILS_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+
+		staticDetailsFormFields.put("formFields", staticFieldsMap);
+		response.put("staticDetails", staticDetailsFormFields);
+		}else {
+			Map<String, Object> staticFieldsMap = staticDetailsResult.stream()
+					.peek(item -> {
+						if(object.has(item.getPFD_COLUMN_NAME())) {
+							item.setPFD_FLD_VALUE(object.get(item.getPFD_COLUMN_NAME()));
+						}
+					})
+					.collect(Collectors.toMap(LM_STATIC_DETAILS_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+
+			staticDetailsFormFields.put("formFields", staticFieldsMap);
+			response.put("static_Details", staticDetailsFormFields);
+		}
+
+		List<LM_FRONT_FORM_FLD_DEFN> frontFormResult = commonDao
+				.getFrontFormList(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString());
+		if(JSONempty == true) {
+		Map<String, Object> frontFormMap = frontFormResult.stream().peek(i -> {
+			if (i.getPFD_FORM_ITEM_TYPE1().equals("FrontForm")) {
+				frontFormFields.put("Label", i.getPFD_FLD_NAME());
+			}
+		}).collect(Collectors.toMap(LM_FRONT_FORM_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+		frontFormFields.put("formFields", frontFormMap);
+		response.put("frontForm", frontFormFields);
+	} else {
+		Map<String, Object> frontFormMap = frontFormResult.stream().peek(i -> {
+			if (object.has(i.getPFD_COLUMN_NAME())) {
+				i.setPFD_FLD_VALUE(object.get(i.getPFD_COLUMN_NAME()));
+			}
+			if (i.getPFD_FORM_ITEM_TYPE1().equals("FrontForm")) {
+				frontFormFields.put("Label", i.getPFD_FLD_NAME());
+			}
+		}).collect(Collectors.toMap(LM_FRONT_FORM_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+		frontFormFields.put("formFields", frontFormMap);
+		response.put("frontForm", frontFormFields);
+	}
+
+		List<LM_ACCORDION_FLD_DEFN> accordionsResult = commonDao
+				.getAccordionResult(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString());
+		int accTabs = 0;
+		for(int i =0; i<accordionsResult.size(); i++) {
+			accTabs = 0;
+			List<LM_ACCORDION_FLD_DEFN> accordionFields = commonDao
+					.getAccordionFields(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString(), accordionsResult.get(i).getPFD_FLD_NAME());
+			JSONObject accordionTabsResponse = new JSONObject();
+			accordionTabsResponse.put("Label", accordionsResult.get(i).getPFD_FLD_NAME());
+			for(int j=0; j<accordionFields.size(); j++) {
+				if(accordionFields.get(j).getPFD_FORM_ITEM_TYPE1().equals("AccordionTab")) {
+					JSONObject accordionTabres = new JSONObject();
+					List<LM_ACCOTAB_FLD_DEFN> accordionTabs = commonDao.getAccoTabs(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString(), accordionFields.get(j).getPFD_FLD_NAME());
+					Map<String, Object> accordionTabsMap = accordionTabs.stream()
+							.collect(Collectors.toMap(LM_ACCOTAB_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+					List<LM_ACCOTAB_FLD_DEFN> accordionSubTabs = commonDao.getAccordionSubTabs(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString(), accordionFields.get(j).getPFD_FLD_NAME());
+					accordionTabres.put("Label", accordionFields.get(j).getPFD_FLD_NAME());
+					if(accordionSubTabs.size() <= 0) {
+					accordionTabres.put("formFields", accordionTabsMap);
+					}
+					if(accordionFields.size() > 1) {
+						accTabs = 1;
+					}
+					accordionTabsResponse.put(accordionFields.get(j).getPFD_FLD_NAME(), accordionTabres);
+					
+					if(accordionSubTabs.size() > 0) {
+						accordionTabres.put("tabs", parseSubTabs(accordionSubTabs, parametermap, object));
+					}
+				}else if(accordionFields.get(j).getPFD_FORM_ITEM_TYPE1().equals("AccordionForm")) {
+					
+				}else if(accordionFields.get(j).getPFD_FORM_ITEM_TYPE1().equals("AccordionMrv")) {
+					
+				}
+			}
+			JSONObject tabs = new JSONObject();
+			if(accTabs == 1) {
+				tabs.put("tabs", accordionTabsResponse);
+				accordionResponse.put(accordionsResult.get(i).getPFD_FLD_NAME(), tabs);	
+			}
+			else {
+			accordionResponse.put(accordionsResult.get(i).getPFD_FLD_NAME(), accordionTabsResponse);
+			}
+			List<LM_ACCORDION_FLD_DEFN> accordionFieldsDefn = commonDao.getAccordionFieldsDefn(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString(), accordionsResult.get(i).getPFD_FLD_NAME());
+			if(JSONempty == true) {
+			Map<String, Object> accordionFieldsDefnMap = accordionFieldsDefn.stream()
+					.collect(Collectors.toMap(LM_ACCORDION_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+			if(accordionFieldsDefn.size() > 1) {
+				tabs.put("Label", accordionsResult.get(i).getPFD_FLD_NAME());
+				tabs.put("formFields", accordionFieldsDefnMap);
+				accordionResponse.put(accordionsResult.get(i).getPFD_FLD_NAME(), tabs);	
+				}
+			}else {
+				Map<String, Object> accordionFieldsDefnMap = accordionFieldsDefn.stream()
+						.peek(item -> {
+							if (object.has(item.getPFD_COLUMN_NAME())) {
+								item.setPFD_FLD_VALUE(object.get(item.getPFD_COLUMN_NAME()));
+							}
+						})
+						.collect(Collectors.toMap(LM_ACCORDION_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+				if(accordionFieldsDefn.size() > 1) {
+					tabs.put("Label", accordionsResult.get(i).getPFD_FLD_NAME());
+					tabs.put("formFields", accordionFieldsDefnMap);
+					accordionResponse.put(accordionsResult.get(i).getPFD_FLD_NAME(), tabs);	
+					}				
+			}
+			response.put("accordions", accordionResponse);
+		}
+		
+		List<MRVKeyValue> mrvFetch = commonDao.getMrvFetchList(parametermap.get("screenName"));
+		response.put("mrvListingId", mrvFetch);
+
+		return response.toString();
+	}
+
+	private JSONObject parseSubTabs(List<LM_ACCOTAB_FLD_DEFN> accordionSubTabs, Map<String, Object> parametermap, JSONObject object) {
+		JSONObject accordionTabsResponse = new JSONObject();
+		for(int i=0; i<accordionSubTabs.size(); i++) {
+			JSONObject accordionTabres = new JSONObject();
+			List<LM_ACCOTAB_FLD_DEFN> accordionTabs = commonDao.getAccoTabs(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString(), accordionSubTabs.get(i).getPFD_FLD_NAME());
+			if(object.isEmpty() == true) {
+			Map<String, Object> accordionTabsMap = accordionTabs.stream()
+					.collect(Collectors.toMap(LM_ACCOTAB_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+			accordionTabres.put("Label", accordionSubTabs.get(i).getPFD_FLD_NAME());
+			if(accordionTabsMap.size() > 0) {
+			accordionTabres.put("formFields", accordionTabsMap);
+			}
+			}else {
+				Map<String, Object> accordionTabsMap = accordionTabs.stream()
+						.peek(item -> {
+							if (object.has(item.getPFD_COLUMN_NAME())) {
+								item.setPFD_FLD_VALUE(object.get(item.getPFD_COLUMN_NAME()));
+							}
+						})
+						.collect(Collectors.toMap(LM_ACCOTAB_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+				accordionTabres.put("Label", accordionSubTabs.get(i).getPFD_FLD_NAME());
+				if(accordionTabsMap.size() > 0) {
+					accordionTabres.put("formFields", accordionTabsMap);
+					}
+			}
+			List<LM_ACCOTAB_FLD_DEFN> accordionSubTab = commonDao.getAccordionSubTabs(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString(), accordionSubTabs.get(i).getPFD_FLD_NAME());
+			if(accordionSubTab.size() > 0) {
+				accordionTabres.put("tabs", parseSubTabs(accordionSubTabs, parametermap, object));
+			}
+			accordionTabsResponse.put(accordionSubTabs.get(i).getPFD_FLD_NAME(), accordionTabres);
+		}
+		return accordionTabsResponse;
+	}
+
+	@Override
+	public String quotationEdit(HttpServletRequest request)
+			throws SecurityException, IllegalArgumentException, IllegalAccessException {
+
+		Map<String, Object> parametermap = processParamLOV(null, request);
+		JSONObject inputObject = new JSONObject();
+		lt_policy object = commonDao.getQuotationFields(parametermap.get("screenCode").toString(),
+				parametermap.get("screenName").toString(), parametermap.get("tranId"));
+		for (int i = 0; i < object.getClass().getDeclaredFields().length; i++) {
+			Field field = object.getClass().getDeclaredFields()[i];
+			field.setAccessible(true);
+			String columnName = null;
+			if (field.isAnnotationPresent(Column.class)) {
+				Annotation annotation = field.getAnnotation(Column.class);
+				Column column = (Column) annotation;
+				Object value = field.get(object);
+				columnName = column.name();
+				inputObject.put(columnName, value);
+			}
+		}
+		
+		return editFields(request, inputObject);
+	}
+
+	@Override
+	public String userMasterEdit(HttpServletRequest request) throws IllegalArgumentException, IllegalAccessException {
+		
+		Map<String, Object> parametermap = processParamLOV(null, request);
+		JSONObject inputObject = new JSONObject();
+		LM_MENU_USERS object = commonDao.getUserFields(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString(), parametermap.get("tranId"));
+		for (int i = 0; i < object.getClass().getDeclaredFields().length; i++) {
+		Field field = object.getClass().getDeclaredFields()[i];
+		field.setAccessible(true);
+		String columnName = null;
+		if (field.isAnnotationPresent(Column.class)) {
+			Annotation annotation = field.getAnnotation(Column.class);
+			Column column = (Column) annotation;
+			Object value = field.get(object);
+			columnName = column.name();
+			inputObject.put(columnName, value);
+		}
+	}
+		return editFields(request, inputObject);
+	}
+
+	@Override
+	public String customerMasterEdit(HttpServletRequest request) throws IllegalArgumentException, IllegalAccessException {
+		
+		Map<String, Object> parametermap = processParamLOV(null, request);
+		JSONObject inputObject = new JSONObject();
+		LM_CUSTOMER object = commonDao.getCustomerFields(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString(), parametermap.get("tranId"));
+		for (int i = 0; i < object.getClass().getDeclaredFields().length; i++) {
+		Field field = object.getClass().getDeclaredFields()[i];
+		field.setAccessible(true);
+		String columnName = null;
+		if (field.isAnnotationPresent(Column.class)) {
+			Annotation annotation = field.getAnnotation(Column.class);
+			Column column = (Column) annotation;
+			Object value = field.get(object);
+			columnName = column.name();
+			System.out.println(columnName);
+			inputObject.put(columnName, value);
+		}
+	}
+		return editFields(request, inputObject);
 	}
 
 }

@@ -118,4 +118,111 @@ public class CommonDaoImpl implements CommonDao {
 		return result;
 	}
 
+	@Override
+	public List<LM_FRONT_FORM_FLD_DEFN> getFrontFormList(String screenCode, String screenName) {
+		String sql = "SELECT * FROM LM_FRONT_FORM_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ?";
+		List<LM_FRONT_FORM_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName}, new BeanPropertyRowMapper<>(LM_FRONT_FORM_FLD_DEFN.class));
+		return result;
+	}
+
+	@Override
+	public List<LM_HEADER_INFO_FLD_DEFN> getHeaderInfoList(String screenCode, String screenName) {
+		String sql = "SELECT * FROM LM_HEADER_INFO_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ?";
+		List<LM_HEADER_INFO_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName}, new BeanPropertyRowMapper<>(LM_HEADER_INFO_FLD_DEFN.class));
+		return result;
+	}
+
+	@Override
+	public List<LM_STATIC_DETAILS_FLD_DEFN> getStaticDetailsList(String screenCode, String screenName) {
+		String sql = "SELECT * FROM LM_STATIC_DETAILS_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ?";
+		List<LM_STATIC_DETAILS_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName}, new BeanPropertyRowMapper<>(LM_STATIC_DETAILS_FLD_DEFN.class));
+		return result;
+	}
+
+	@Override
+	public List<LM_ACCORDION_FLD_DEFN> getAccordionResult(String screenCode, String screenName) {
+		String sql = "SELECT * FROM LM_ACCORDION_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ? AND PFD_FORM_ITEM_TYPE1 = 'AccordionHeader'";
+		List<LM_ACCORDION_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName}, new BeanPropertyRowMapper<>(LM_ACCORDION_FLD_DEFN.class));
+		return result;
+	}
+
+	@Override
+	public List<LM_ACCORDION_FLD_DEFN> getAccordionFields(String screenCode, String screenName, String fieldName) {
+		String sql = "SELECT * FROM LM_ACCORDION_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ? AND PFD_FORM_ITEM_TYPE1 not in ('AccordionHeader') AND PFD_FORM_ITEM_TYPE2 = ?";
+		List<LM_ACCORDION_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName, fieldName}, new BeanPropertyRowMapper<>(LM_ACCORDION_FLD_DEFN.class));
+		return result;
+	}
+
+	@Override
+	public List<LM_ACCOTAB_FLD_DEFN> getAccoTabs(String screenCode, String screenName, String fieldName) {
+		String sql = "SELECT * FROM LM_ACCOTAB_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ? AND PFD_FORM_ITEM_TYPE1 not in ('AccordionHeader', 'AccordionTab') AND PFD_FORM_ITEM_TYPE2 = ?";
+		List<LM_ACCOTAB_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName, fieldName}, new BeanPropertyRowMapper<>(LM_ACCOTAB_FLD_DEFN.class));
+		return result;
+	}
+
+	@Override
+	public List<LM_ACCORDION_FLD_DEFN> getAccordionFieldsDefn(String screenCode, String screenName, String fieldName) {
+		String sql = "SELECT * FROM LM_ACCORDION_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ? AND PFD_FORM_ITEM_TYPE1 not in ('AccordionHeader', 'AccordionTab') AND PFD_FORM_ITEM_TYPE2 = ?";
+		List<LM_ACCORDION_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName, fieldName}, new BeanPropertyRowMapper<>(LM_ACCORDION_FLD_DEFN.class));
+		return result;
+	}
+
+	@Override
+	public List<LM_ACCOTAB_FLD_DEFN> getAccordionSubTabs(String screenCode, String screenName, String fieldName) {
+		String sql = "SELECT * FROM LM_ACCOTAB_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ? AND PFD_FORM_ITEM_TYPE1 in ('AccordionTab') AND PFD_FORM_ITEM_TYPE2 = ?";
+		List<LM_ACCOTAB_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName, fieldName}, new BeanPropertyRowMapper<>(LM_ACCOTAB_FLD_DEFN.class));
+		return result;
+	}
+
+	@Override
+	public lt_policy getQuotationFields(String string, String string2, Object object) {
+		String query = "SELECT * FROM lt_policy WHERE pol_tran_id = ?";
+		lt_policy result =  template.queryForObject(query, new Object[] {object.toString()}, new BeanPropertyRowMapper<>(lt_policy.class));
+		return result;
+	}
+
+	@Override
+	public LM_MENU_USERS getUserFields(String string, String string2, Object object) {
+		String query = "SELECT * FROM lm_menu_users WHERE user_id = ?";
+		LM_MENU_USERS result =  template.queryForObject(query, new Object[] {object.toString()}, new BeanPropertyRowMapper<>(LM_MENU_USERS.class));
+		return result;
+	}
+
+	@Override
+	public lt_pol_nominee getNomineeFields(String string, String string2, Object object) {
+		String query = "SELECT * FROM lt_pol_nominee WHERE PN_POL_TRAN_ID = ?";
+		lt_pol_nominee result =  template.queryForObject(query, new Object[] {object}, new BeanPropertyRowMapper<>(lt_pol_nominee.class));
+		return result;
+	}
+
+	@Override
+	public lt_pol_assrd_det getAssuredFields(String string, String string2, Object object) {
+		String query = "SELECT * FROM lt_pol_assrd_det WHERE PAD_POL_TRAN_ID = ?";
+		lt_pol_assrd_det result =  template.queryForObject(query, new Object[] {object}, new BeanPropertyRowMapper<>(lt_pol_assrd_det.class));
+		return result;
+	}
+
+	@Override
+	public lt_pol_charge getPolChargeFields(String string, String string2, Long object) {
+		String query = "SELECT * FROM lt_pol_charge WHERE POC_POL_TRAN_ID = ?";
+		lt_pol_charge result =  template.queryForObject(query, new Object[] {object}, new BeanPropertyRowMapper<>(lt_pol_charge.class));
+		return result;
+	}
+
+	@Override
+	public List<MRVKeyValue> getMrvFetchList(Object object) {
+		String query = "SELECT QM_QUERY_NAME as queryName, QM_SYS_ID as queryId FROM QUERY_MASTER WHERE QM_SCREEN_NAME = ? AND QM_QUERY_TYPE = 'listingMrv'";
+		List<MRVKeyValue> result =  template.query(query, new Object[] {object}, new BeanPropertyRowMapper<>(MRVKeyValue.class));
+		return result;
+	}
+
+	@Override
+	public LM_CUSTOMER getCustomerFields(String string, String string2, Object object) {
+		String query = "SELECT * FROM lm_customer WHERE cust_code = ?";
+		LM_CUSTOMER result =  template.queryForObject(query, new Object[] {object}, new BeanPropertyRowMapper<>(LM_CUSTOMER.class));
+		return result;
+	}
+	
+	
+
 }

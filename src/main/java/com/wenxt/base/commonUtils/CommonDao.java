@@ -30,5 +30,35 @@ public interface CommonDao {
 	List<LM_PROG_FIELD_DEFN_NEW> getFrontFormDetails();
 
 	List<LovToJsonDTO> lovToJson(String qm_QUERY, String string, String string2);
+	
+	List<LM_FRONT_FORM_FLD_DEFN> getFrontFormList(String screenCode, String screenName);
+
+	List<LM_HEADER_INFO_FLD_DEFN> getHeaderInfoList(String string, String string2);
+
+	List<LM_STATIC_DETAILS_FLD_DEFN> getStaticDetailsList(String string, String string2);
+
+	List<LM_ACCORDION_FLD_DEFN> getAccordionResult(String string, String string2);
+
+	List<LM_ACCORDION_FLD_DEFN> getAccordionFields(String string, String string2, String fieldName);
+
+	List<LM_ACCOTAB_FLD_DEFN> getAccoTabs(String string, String string2, String pfd_FLD_NAME);
+
+	List<LM_ACCORDION_FLD_DEFN> getAccordionFieldsDefn(String string, String string2, String pfd_FLD_NAME);
+
+	List<LM_ACCOTAB_FLD_DEFN> getAccordionSubTabs(String string, String string2, String pfd_FLD_NAME);
+
+	lt_policy getQuotationFields(String string, String string2, Object object);
+
+	LM_MENU_USERS getUserFields(String string, String string2, Object object);
+
+	lt_pol_nominee getNomineeFields(String string, String string2, Object object);
+
+	lt_pol_assrd_det getAssuredFields(String string, String string2, Object getpol_tran_id);
+
+	lt_pol_charge getPolChargeFields(String string, String string2, Long getpol_tran_id);
+
+	List<MRVKeyValue> getMrvFetchList(Object object);
+
+	LM_CUSTOMER getCustomerFields(String string, String string2, Object object);
 
 }

@@ -9,13 +9,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import jakarta.ws.rs.DefaultValue;
-import lombok.Builder.Default;
 
 @Entity
-@Table(name = "LM_PROG_FIELD_DEFN")
-public class LM_PROG_FIELD_DEFN_NEW
-{
+@Table(name = "LM_FRONT_FORM_FLD_DEFN")
+public class LM_FRONT_FORM_FLD_DEFN {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

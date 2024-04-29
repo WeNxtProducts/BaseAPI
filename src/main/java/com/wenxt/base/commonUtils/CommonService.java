@@ -1,5 +1,6 @@
 package com.wenxt.base.commonUtils;
 
+import org.json.JSONObject;
 import org.springframework.scheduling.annotation.Async;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +25,7 @@ public interface CommonService {
 	
 	public String getMrvListing(HttpServletRequest request);
 	
-	public String getFieldList(HttpServletRequest request);
+	public String getFieldList(HttpServletRequest request) throws IllegalArgumentException, IllegalAccessException;
 	
 	public void asyncMethod(AsyncDTO inputRequest, HttpServletRequest request);
 	
@@ -34,8 +35,14 @@ public interface CommonService {
 	
 	public String serviceToJson(HttpServletRequest request);
 
-	public String editFields(HttpServletRequest request);
+	public String editFields(HttpServletRequest request, JSONObject object);
 
 	public String lovToJson(HttpServletRequest request);
+
+	public String quotationEdit(HttpServletRequest request) throws SecurityException, IllegalArgumentException, IllegalAccessException;
+
+	public String userMasterEdit(HttpServletRequest request) throws IllegalArgumentException, IllegalAccessException;
+
+	public String customerMasterEdit(HttpServletRequest request) throws IllegalArgumentException, IllegalAccessException;
 
 }

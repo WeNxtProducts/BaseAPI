@@ -17,131 +17,259 @@ public class LM_MENU_USERS {
 	private String	userId;
 	
 //	private String	user_id;
+	@Column(name="user_passwd")
 	private String	user_passwd;
+	
+	@Column(name="user_desc")
 	private String	user_desc;
+	
+	@Column(name="user_group_id")
 	@Nullable
 	private String	user_group_id;
+	
+	@Column(name="user_bl_desc")
 	@Nullable
 	private String	user_bl_desc;
+	
+	@Column(name="user_start_menu_id")
 	@Nullable
 	private String	user_start_menu_id;
+	
+	@Column(name="user_ask_passwd_flag")
 	@Nullable
 	private String	user_ask_passwd_flag;
+	
+	@Column(name="user_change_passwd_flag")
 	@Nullable
 	private String	user_change_passwd_flag;
+	
+	@Column(name="user_disable_flag")
 	@Nullable
 	private String	user_disable_flag;
+	
+	@Column(name="user_default_printer")
 	@Nullable
 	private String	user_default_printer;
+	
+	@Column(name="user_rep_userid_passwd")
 	@Nullable
 	private String	user_rep_userid_passwd;
+	
+	@Column(name="user_tel_no")
 	@Nullable
 	private String	user_tel_no;
+	
+	@Column(name="user_tel_extn")
 	@Nullable
 	private String	user_tel_extn;
+	
+	@Column(name="user_fax_no")
 	@Nullable
 	private String	user_fax_no;
 	
-	private Short	user_login_count;
+	@Column(name="user_login_count")
+	@Nullable
+	private short user_login_count;
+	
+	@Column(name="user_ext_yn")
 	@Nullable
 	private String	user_ext_yn;
+	
+	@Column(name="user_vps")
 	@Nullable
 	private String	user_vps;
 	
-	private Short	user_copies;
+	@Column(name="user_copies")
+	@Nullable
+	private short	user_copies;
+	
+	@Column(name="user_prn_code")
 	@Nullable
 	private String	user_prn_code;
+	
+	@Column(name="user_pf_code")
 	@Nullable
 	private String	user_pf_code;
+	
+	@Column(name="user_override_yn")
 	@Nullable
 	private String	user_override_yn;
+	
+	@Column(name="user_ins_Dt")
+	@Nullable
 	private LocalDateTime	user_ins_Dt;
+	
+	@Column(name="user_ins_id")
 	@Nullable
 	private String	user_ins_id;
 	
-	private LocalDateTime	user_mod_Dt;
+	@Column(name="user_mod_Dt")
+	@Nullable
+	private LocalDateTime user_mod_Dt;
+	
+	@Column(name="user_mod_id")
 	@Nullable
 	private String	user_mod_id;
+	
+	@Column(name="user_comp_code")
 	@Nullable
 	private String	user_comp_code;
+	
+	@Column(name="user_administrator_yn")
 	@Nullable
 	private String	user_administrator_yn;
+	
 	@Column(name="user_email_id")
 	private String	userEmailId;
+	
+	@Column(name="user_mobile_no")
 	@Nullable
 	private String	user_mobile_no;
+	
+	@Column(name="user_bl_disp_yn_num")
 	@Nullable
 	private String	user_bl_disp_yn_num;
+	
+	@Column(name="user_vps_flag")
 	@Nullable
 	private String	user_vps_flag;
+	
+	@Column(name="user_res_tel_no")
 	@Nullable
 	private String	user_res_tel_no;
+	
+	@Column(name="user_remarks")
 	@Nullable
 	private String	user_remarks;
+	
+	@Column(name="user_expiry_day_count")
 	@Nullable
 	private Integer	user_expiry_day_count;
+	
+	@Column(name="user_passwd_expiry_yn")
 	@Nullable
 	private String	user_passwd_expiry_yn;
+	
+	@Column(name="user_expiry_dt")
 	@Nullable
 	private String	user_expiry_dt;
+	
 	@Column(name="user_first_login_yn")
 	private Boolean userFirstLoginyn;
+	
+	@Column(name="user_frz_flag")
 	@Nullable
 	private String	user_frz_flag;
+	
+	@Column(name="user_initial")
 	@Nullable
 	private String	user_initial;
+	
+	@Column(name="user_designation")
 	@Nullable
 	private String	user_designation;
+	
+	@Column(name="user_desig_desc")
 	@Nullable
 	private String	user_desig_desc;
+	
+	@Column(name="user_logon_option")
 	@Nullable
 	private String	user_logon_option;
+	
+	@Column(name="user_status")
 	@Nullable
 	private String	user_status;
+	
+	@Column(name="user_eff_to_dt")
 	@Nullable
 	private String	user_eff_to_dt;
+	
+	@Column(name="user_ter_reason")
 	@Nullable
 	private String	user_ter_reason;
+	
+	@Column(name="user_credit_card_upd_yn")
 	@Nullable
 	private String	user_credit_card_upd_yn;
+	
+	@Column(name="user_valid_upto")
 	@Nullable
 	private String	user_valid_upto;
+	
+	@Column(name="user_pass_exp_date")
 	@Nullable
 	private String	user_pass_exp_date;
+	
+	@Column(name="user_fstlog_flag")
 	@Nullable
 	private String	user_fstlog_flag;
+	
+	@Column(name="user_locked_yn")
 	@Nullable
 	private String	user_locked_yn;
+	
+	@Column(name="user_no_of_failed_logins")
 	@Nullable
 	private String	user_no_of_failed_logins;
+	
+	@Column(name="user_lock_reason")
 	@Nullable
 	private String	user_lock_reason;
+	
+	@Column(name="user_email")
 	@Nullable
 	private String	user_email;
+	
+	@Column(name="user_port_code")
 	@Nullable
 	private String	user_port_code;
+	
+	@Column(name="user_client_id")
 	@Nullable
 	private String	user_client_id;
+	
+	@Column(name="user_client_code")
 	@Nullable
 	private String	user_client_code;
+	
+	@Column(name="user_dft_company_code")
 	@Nullable
 	private String	user_dft_company_code;
+	
+	@Column(name="user_pwd_remind_num")
 	@Nullable
 	private String	user_pwd_remind_num;
+	
+	@Column(name="user_pwd_wrong_allow_num")
 	@Nullable
 	private String	user_pwd_wrong_allow_num;
+	
+	@Column(name="user_pwd_wrong_limit_yn")
 	@Nullable
 	private String	user_pwd_wrong_limit_yn;
+	
+	@Column(name="user_security_code")
 	@Nullable
 	private String	user_security_code;
+	
+	@Column(name="user_inst_code")
 	@Nullable
 	private String	user_inst_code;
+	
+	@Column(name="user_ds_group_id")
 	@Nullable
 	private String	user_ds_group_id;
+	
+	@Column(name="user_pwd_reuse_count")
 	@Nullable
 	private Double	user_pwd_reuse_count;
+	
+	@Column(name="user_dflt_lang_code")
 	@Nullable
 	private String	user_dflt_lang_code;
+	
+	@Column(name="user_signature")
 	@Nullable
 	private String	user_signature;
 	
@@ -242,12 +370,10 @@ public class LM_MENU_USERS {
 	public void setUser_fax_no(String user_fax_no) {
 		this.user_fax_no = user_fax_no;
 	}
-	
-	
-	public Short getUser_login_count() {
+	public short getUser_login_count() {
 		return user_login_count;
 	}
-	public void setUser_login_count(Short user_login_count) {
+	public void setUser_login_count(short user_login_count) {
 		this.user_login_count = user_login_count;
 	}
 	public String getUser_ext_yn() {
@@ -262,11 +388,10 @@ public class LM_MENU_USERS {
 	public void setUser_vps(String user_vps) {
 		this.user_vps = user_vps;
 	}
-	
-	public Short getUser_copies() {
+	public short getUser_copies() {
 		return user_copies;
 	}
-	public void setUser_copies(Short user_copies) {
+	public void setUser_copies(short user_copies) {
 		this.user_copies = user_copies;
 	}
 	public String getUser_prn_code() {
@@ -287,19 +412,17 @@ public class LM_MENU_USERS {
 	public void setUser_override_yn(String user_override_yn) {
 		this.user_override_yn = user_override_yn;
 	}
-
-	public String getUser_ins_id() {
-		return user_ins_id;
-	}
-	public void setUser_ins_id(String user_ins_id) {
-		this.user_ins_id = user_ins_id;
-	}
-	
 	public LocalDateTime getUser_ins_Dt() {
 		return user_ins_Dt;
 	}
 	public void setUser_ins_Dt(LocalDateTime user_ins_Dt) {
 		this.user_ins_Dt = user_ins_Dt;
+	}
+	public String getUser_ins_id() {
+		return user_ins_id;
+	}
+	public void setUser_ins_id(String user_ins_id) {
+		this.user_ins_id = user_ins_id;
 	}
 	public LocalDateTime getUser_mod_Dt() {
 		return user_mod_Dt;
@@ -368,7 +491,6 @@ public class LM_MENU_USERS {
 	public void setUser_remarks(String user_remarks) {
 		this.user_remarks = user_remarks;
 	}
-	
 	public Integer getUser_expiry_day_count() {
 		return user_expiry_day_count;
 	}
@@ -553,7 +675,6 @@ public class LM_MENU_USERS {
 	public void setUser_ds_group_id(String user_ds_group_id) {
 		this.user_ds_group_id = user_ds_group_id;
 	}
-	
 	public Double getUser_pwd_reuse_count() {
 		return user_pwd_reuse_count;
 	}
