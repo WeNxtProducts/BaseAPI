@@ -189,27 +189,6 @@ public class CommonDaoImpl implements CommonDao {
 	}
 
 	@Override
-	public lt_pol_nominee getNomineeFields(String string, String string2, Object object) {
-		String query = "SELECT * FROM lt_pol_nominee WHERE PN_POL_TRAN_ID = ?";
-		lt_pol_nominee result =  template.queryForObject(query, new Object[] {object}, new BeanPropertyRowMapper<>(lt_pol_nominee.class));
-		return result;
-	}
-
-	@Override
-	public lt_pol_assrd_det getAssuredFields(String string, String string2, Object object) {
-		String query = "SELECT * FROM lt_pol_assrd_det WHERE PAD_POL_TRAN_ID = ?";
-		lt_pol_assrd_det result =  template.queryForObject(query, new Object[] {object}, new BeanPropertyRowMapper<>(lt_pol_assrd_det.class));
-		return result;
-	}
-
-	@Override
-	public lt_pol_charge getPolChargeFields(String string, String string2, Long object) {
-		String query = "SELECT * FROM lt_pol_charge WHERE POC_POL_TRAN_ID = ?";
-		lt_pol_charge result =  template.queryForObject(query, new Object[] {object}, new BeanPropertyRowMapper<>(lt_pol_charge.class));
-		return result;
-	}
-
-	@Override
 	public List<MRVKeyValue> getMrvFetchList(Object object) {
 		String query = "SELECT QM_QUERY_NAME as queryName, QM_SYS_ID as queryId FROM QUERY_MASTER WHERE QM_SCREEN_NAME = ? AND QM_QUERY_TYPE = 'listingMrv'";
 		List<MRVKeyValue> result =  template.query(query, new Object[] {object}, new BeanPropertyRowMapper<>(MRVKeyValue.class));

@@ -51,12 +51,6 @@ public interface CommonDao {
 
 	LM_MENU_USERS getUserFields(String string, String string2, Object object);
 
-	lt_pol_nominee getNomineeFields(String string, String string2, Object object);
-
-	lt_pol_assrd_det getAssuredFields(String string, String string2, Object getpol_tran_id);
-
-	lt_pol_charge getPolChargeFields(String string, String string2, Long getpol_tran_id);
-
 	List<MRVKeyValue> getMrvFetchList(Object object);
 
 	LM_CUSTOMER getCustomerFields(String string, String string2, Object object);

@@ -69,7 +69,7 @@ public class LM_MENU_USERS {
 	
 	@Column(name="user_login_count")
 	@Nullable
-	private short user_login_count;
+	private Short user_login_count;
 	
 	@Column(name="user_ext_yn")
 	@Nullable
@@ -81,7 +81,7 @@ public class LM_MENU_USERS {
 	
 	@Column(name="user_copies")
 	@Nullable
-	private short	user_copies;
+	private Short	user_copies;
 	
 	@Column(name="user_prn_code")
 	@Nullable
