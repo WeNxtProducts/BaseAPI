@@ -102,4 +102,14 @@ public class LoginController {
 		return loginService.getAllcompanyListByuser(user);
 	}
 
+	@PostMapping("/companyList")
+	public String getAllDeptListByUser(@RequestBody LoginDropDownRequestModel user) {
+		return loginService.getAllDeptListByUser(user);
+	}
+	
+	@PostMapping("/deptsubmit")
+	public String getAllDeptSubmit(@RequestBody DeptSubmitRequest deptrequest) {
+		return loginService.getAllDeptSubmit(deptrequest);
+	}
+
 }

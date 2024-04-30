@@ -19,6 +19,7 @@ import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -107,6 +108,11 @@ public class LoginServiceImpl implements LoginService {
 
 	@Value("${spring.data.code}")
 	private String dataCode;
+	
+	@Autowired
+	private JdbcTemplate template;
+	
+	
 
 	@Override
 	public String getCompany(LoginDropDownRequestModel user) {
@@ -185,7 +191,7 @@ public class LoginServiceImpl implements LoginService {
 		List<LOVDTO> list = new ArrayList<>();
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject obj = jsonArray.getJSONObject(i);
-			LOVDTO model = new LOVDTO(obj.get("Label"), obj.get("value")); // Assuming model structure
+			LOVDTO model = new LOVDTO(obj.get("label"), obj.get("value")); // Assuming model structure
 			list.add(model);
 		}
 		response.put(statusCode, successCode);
@@ -567,7 +573,7 @@ public class LoginServiceImpl implements LoginService {
 
 		JSONObject response = new JSONObject();
 		RestTemplate restTemplate = new RestTemplate();
-		String url = getBaseURL + "common/getparamlov?queryId=20&muc_user_id= muc_user_id";
+		String url = getBaseURL + "common/getparamlov?queryId=";
 		ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
 		if (responseEntity.getStatusCode() == HttpStatus.OK) {
 			String serviceResponse = responseEntity.getBody();
@@ -616,5 +622,126 @@ public class LoginServiceImpl implements LoginService {
 		}
 
 	}
+	
+	@Override
+	public String getAllDeptListByUser(LoginDropDownRequestModel user) {
+	    JSONObject response = new JSONObject();
+	    RestTemplate restTemplate = new RestTemplate();
+	    String baseURL = getBaseURL + "common/getparamlov?queryId=";
+
+	    try {
+	        // Fetching country list
+	        String url = baseURL + "19";
+	        ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
+	        if (responseEntity.getStatusCode() == HttpStatus.OK) {
+	            String serviceResponse = responseEntity.getBody();
+	            JSONArray jsonArray = null;
+	            try {
+	                jsonArray = new JSONObject(serviceResponse).getJSONArray("Data");
+	            } catch (JSONException e) {
+	                throw new UsernameNotFoundException("Data not found in the response");
+	            }
+	            List<LOVDTO> countryList = parseLOVDTOList(jsonArray);
+	            user.setCompanyListCodes(countryList);
+	        } else {
+	            throw new UsernameNotFoundException("Error fetching country list");
+	        }
+
+	        // Fetching branch list
+	        url = baseURL + "20";
+	        responseEntity = restTemplate.getForEntity(url, String.class);
+	        if (responseEntity.getStatusCode() == HttpStatus.OK) {
+	            String serviceResponse = responseEntity.getBody();
+	            JSONArray jsonArray = null;
+	            try {
+	                jsonArray = new JSONObject(serviceResponse).getJSONArray("Data");
+	            } catch (JSONException e) {
+	                throw new UsernameNotFoundException("Data not found in the response");
+	            }
+	            List<LOVDTO> branchList = parseLOVDTOList(jsonArray);
+	            user.setBranchListCodes(branchList);
+	        } else {
+	            throw new UsernameNotFoundException("Error fetching branch list");
+	        }
+
+	        // Fetching department list
+	        url = baseURL + "28";
+	        responseEntity = restTemplate.getForEntity(url, String.class);
+	        if (responseEntity.getStatusCode() == HttpStatus.OK) {
+	            String serviceResponse = responseEntity.getBody();
+	            JSONArray jsonArray = null;
+	            try {
+	                jsonArray = new JSONObject(serviceResponse).getJSONArray("Data");
+	            } catch (JSONException e) {
+	                throw new UsernameNotFoundException("Data not found in the response");
+	            }
+	            List<LOVDTO> departmentList = parseLOVDTOList(jsonArray);
+	            user.setDeptListCodes(departmentList);
+	        } else {
+	            throw new UsernameNotFoundException("Error fetching department list");
+	        }
+
+	        // Business logic with KieSession (if needed)
+
+	        // Response construction
+	        response.put("statusCode", "successCode");
+	        response.put("messageCode", "getCompanyMessage");
+	        response.put("companyList", user.getCompanyListCodes());
+	        response.put("branchList", user.getBranchListCodes());
+	        response.put("departmentList", user.getDeptListCodes());
+
+	    } catch (Exception e) {
+	        response.put("statusCode", "errorCode");
+	        response.put("stsmsg", "Error occurred");
+	        response.put("error", e.getMessage());
+	    }
+
+	    return response.toString();
+	}
+	private List<LOVDTO> parseLOVDTOList(JSONArray jsonArray) {
+        List<LOVDTO> list = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject obj = jsonArray.getJSONObject(i);
+            LOVDTO model = new LOVDTO(obj.getString("label"), obj.getString("value")); // Assuming model structure
+            list.add(model);
+        }
+        return list;
+    }
+
+	@Override
+	public String getAllDeptSubmit(DeptSubmitRequest deptrequest) {
+	    try {
+	        String userId = deptrequest.getUserId();
+	        String companyCode = deptrequest.getCompanyCode();
+	        String divisionCode = deptrequest.getDivisionCode();
+	        String departmentCode = deptrequest.getDepartmentCode();
+
+	        // Update existing record in LM_MENU_USER_COMP_DIVN table
+	        int updatedRows = template.update("UPDATE LM_MENU_USER_COMP_DIVN " +
+	                                          "SET MUCD_DIVN_CODE = ?, MUCD_DEPT_CODE = ? " +
+	                                          "WHERE MUCD_USER_ID = ? AND MUCD_COMP_CODE = ? AND MUCD_DIVN_CODE = ? AND MUCD_DEPT_CODE = ?",
+	                                          divisionCode, departmentCode, userId, companyCode, divisionCode, departmentCode);
+
+	        // If no existing record, insert new record
+	        if (updatedRows == 0) {
+	            template.update("INSERT INTO LM_MENU_USER_COMP_DIVN (MUCD_USER_ID, MUCD_COMP_CODE, MUCD_DIVN_CODE, MUCD_DEPT_CODE) " +
+	                            "VALUES (?, ?, ?, ?)", userId, companyCode, divisionCode, departmentCode);
+	        }
+
+	        // Update LM_MENU_USER_COMP table
+	        template.update("UPDATE LM_MENU_USER_COMP SET MUC_COMP_CODE = ? WHERE MUC_USER_ID = ?", companyCode, userId);
+
+	        // If no existing record, insert new record
+	        int rowCount = template.update("INSERT INTO LM_MENU_USER_COMP (MUC_USER_ID, MUC_COMP_CODE) " +
+	                                       "SELECT ?, ? FROM dual WHERE NOT EXISTS " +
+	                                       "(SELECT 1 FROM LM_MENU_USER_COMP WHERE MUC_USER_ID = ?)",
+	                                       userId, companyCode, userId);
+
+	        return "Data inserted/updated successfully.";
+	    } catch (Exception e) {
+	        return "Error occurred: " + e.getMessage();
+	    }
+	}
+
 
 }

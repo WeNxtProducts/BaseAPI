@@ -25,4 +25,8 @@ public interface LoginService {
 
 	public String getAllcompanyListByuser(LoginDropDownRequestModel user);
 
+	public String getAllDeptListByUser(LoginDropDownRequestModel user);
+
+	public String getAllDeptSubmit(DeptSubmitRequest deptrequest);
+
 }

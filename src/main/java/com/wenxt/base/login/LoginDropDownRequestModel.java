@@ -17,6 +17,12 @@ public class LoginDropDownRequestModel {
 	private String errorMessage;
 	
 	private String errorField;
+	
+	private List<LOVDTO> companyListCodes;
+	
+	private List<LOVDTO> branchListCodes;
+	
+	private List<LOVDTO> deptListCodes;
 
 	public String getUserId() {
 		return userId;
@@ -66,5 +72,31 @@ public class LoginDropDownRequestModel {
 		this.errorField = errorField;
 	}
 
+	public List<LOVDTO> getCompanyListCodes() {
+		return companyListCodes;
+	}
+
+	public void setCompanyListCodes(List<LOVDTO> companyListCodes) {
+		this.companyListCodes = companyListCodes;
+	}
+
+	public List<LOVDTO> getBranchListCodes() {
+		return branchListCodes;
+	}
+
+	public void setBranchListCodes(List<LOVDTO> branchListCodes) {
+		this.branchListCodes = branchListCodes;
+	}
+
+	public List<LOVDTO> getDeptListCodes() {
+		return deptListCodes;
+	}
+
+	public void setDeptListCodes(List<LOVDTO> deptListCodes) {
+		this.deptListCodes = deptListCodes;
+	}
+
+	
+	
 }
 

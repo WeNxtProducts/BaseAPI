@@ -8,7 +8,7 @@ public class LoginRequestModel {
 	
 	private String langCode;
 	
-	private String user;
+//	private String user;
 	
 	private String companyCode;
 	
@@ -40,13 +40,13 @@ public class LoginRequestModel {
 		this.langCode = langCode;
 	}
 
-	public String getUser() {
-		return user;
-	}
-
-	public void setUser(String user) {
-		this.user = user;
-	}
+//	public String getUser() {
+//		return user;
+//	}
+//
+//	public void setUser(String user) {
+//		this.user = user;
+//	}
 
 	public String getCompanyCode() {
 		return companyCode;
