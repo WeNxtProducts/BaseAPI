@@ -39,13 +39,13 @@ public interface CommonDao {
 
 	List<LM_ACCORDION_FLD_DEFN> getAccordionResult(String string, String string2);
 
-	List<LM_ACCORDION_FLD_DEFN> getAccordionFields(String string, String string2, String fieldName);
+	List<LM_ACCORDION_FLD_DEFN> getAccordionFields(String string, String string2);
 
-	List<LM_ACCOTAB_FLD_DEFN> getAccoTabs(String string, String string2, String pfd_FLD_NAME);
+	List<LM_ACCOTAB_FLD_DEFN> getAccoTabs(String string, String string2);
 
-	List<LM_ACCORDION_FLD_DEFN> getAccordionFieldsDefn(String string, String string2, String pfd_FLD_NAME);
+	List<LM_ACCORDION_FLD_DEFN> getAccordionFieldsDefn(String string, String string2);
 
-	List<LM_ACCOTAB_FLD_DEFN> getAccordionSubTabs(String string, String string2, String pfd_FLD_NAME);
+	List<LM_ACCOTAB_FLD_DEFN> getAccordionSubTabs(String string, String string2);
 
 	lt_policy getQuotationFields(String string, String string2, Object object);
 

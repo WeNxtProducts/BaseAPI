@@ -834,45 +834,41 @@ public class CommonServiceImpl implements CommonService {
 		boolean JSONempty = object.isEmpty();
 		Map<String, Object> parametermap = processParamLOV(null, request);
 
-//		QUERY_MASTER exeQuery = commonDao.getQueryLov(16);
+//	QUERY_MASTER exeQuery = commonDao.getQueryLov(16);
 		JSONObject accordionResponse = new JSONObject();
 
 		List<LM_HEADER_INFO_FLD_DEFN> headerInfoResult = commonDao.getHeaderInfoList(
 				parametermap.get("screenCode").toString(), parametermap.get("screenName").toString());
 
-		if(JSONempty == true) {
-		Map<String, Object> headerFieldsMap = headerInfoResult.stream()
-				.collect(Collectors.toMap(LM_HEADER_INFO_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
-		headerInfo.put("formFields", headerFieldsMap);
-		response.put("headerInfo", headerInfo);
-		} else {
+		if (JSONempty == true) {
 			Map<String, Object> headerFieldsMap = headerInfoResult.stream()
-					.peek(item -> {
-						if(object.has(item.getPFD_COLUMN_NAME())) {
-						item.setPFD_FLD_VALUE(object.get(item.getPFD_COLUMN_NAME()));
-						}
-					})
 					.collect(Collectors.toMap(LM_HEADER_INFO_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+			headerInfo.put("formFields", headerFieldsMap);
+			response.put("headerInfo", headerInfo);
+		} else {
+			Map<String, Object> headerFieldsMap = headerInfoResult.stream().peek(item -> {
+				if (object.has(item.getPFD_COLUMN_NAME())) {
+					item.setPFD_FLD_VALUE(object.get(item.getPFD_COLUMN_NAME()));
+				}
+			}).collect(Collectors.toMap(LM_HEADER_INFO_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
 			headerInfo.put("formFields", headerFieldsMap);
 			response.put("headerInfo", headerInfo);
 		}
 
 		List<LM_STATIC_DETAILS_FLD_DEFN> staticDetailsResult = commonDao.getStaticDetailsList(
 				parametermap.get("screenCode").toString(), parametermap.get("screenName").toString());
-		if(JSONempty == true) {
-		Map<String, Object> staticFieldsMap = staticDetailsResult.stream()
-				.collect(Collectors.toMap(LM_STATIC_DETAILS_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
-
-		staticDetailsFormFields.put("formFields", staticFieldsMap);
-		response.put("staticDetails", staticDetailsFormFields);
-		}else {
+		if (JSONempty == true) {
 			Map<String, Object> staticFieldsMap = staticDetailsResult.stream()
-					.peek(item -> {
-						if(object.has(item.getPFD_COLUMN_NAME())) {
-							item.setPFD_FLD_VALUE(object.get(item.getPFD_COLUMN_NAME()));
-						}
-					})
 					.collect(Collectors.toMap(LM_STATIC_DETAILS_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+
+			staticDetailsFormFields.put("formFields", staticFieldsMap);
+			response.put("staticDetails", staticDetailsFormFields);
+		} else {
+			Map<String, Object> staticFieldsMap = staticDetailsResult.stream().peek(item -> {
+				if (object.has(item.getPFD_COLUMN_NAME())) {
+					item.setPFD_FLD_VALUE(object.get(item.getPFD_COLUMN_NAME()));
+				}
+			}).collect(Collectors.toMap(LM_STATIC_DETAILS_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
 
 			staticDetailsFormFields.put("formFields", staticFieldsMap);
 			response.put("static_Details", staticDetailsFormFields);
@@ -880,106 +876,128 @@ public class CommonServiceImpl implements CommonService {
 
 		List<LM_FRONT_FORM_FLD_DEFN> frontFormResult = commonDao
 				.getFrontFormList(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString());
-		if(JSONempty == true) {
-		Map<String, Object> frontFormMap = frontFormResult.stream().peek(i -> {
-			if (i.getPFD_FORM_ITEM_TYPE1().equals("FrontForm")) {
-				frontFormFields.put("Label", i.getPFD_FLD_NAME());
-			}
-		}).collect(Collectors.toMap(LM_FRONT_FORM_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
-		frontFormFields.put("formFields", frontFormMap);
-		response.put("frontForm", frontFormFields);
-	} else {
-		Map<String, Object> frontFormMap = frontFormResult.stream().peek(i -> {
-			if (object.has(i.getPFD_COLUMN_NAME())) {
-				i.setPFD_FLD_VALUE(object.get(i.getPFD_COLUMN_NAME()));
-			}
-			if (i.getPFD_FORM_ITEM_TYPE1().equals("FrontForm")) {
-				frontFormFields.put("Label", i.getPFD_FLD_NAME());
-			}
-		}).collect(Collectors.toMap(LM_FRONT_FORM_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
-		frontFormFields.put("formFields", frontFormMap);
-		response.put("frontForm", frontFormFields);
-	}
-
-		List<LM_ACCORDION_FLD_DEFN> accordionsResult = commonDao
-				.getAccordionResult(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString());
+		if (JSONempty == true) {
+			Map<String, Object> frontFormMap = frontFormResult.stream().peek(i -> {
+				if (i.getPFD_FORM_ITEM_TYPE1().equals("FrontForm")) {
+					frontFormFields.put("Label", i.getPFD_FLD_NAME());
+				}
+			}).collect(Collectors.toMap(LM_FRONT_FORM_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+			frontFormFields.put("formFields", frontFormMap);
+			response.put("frontForm", frontFormFields);
+		} else {
+			Map<String, Object> frontFormMap = frontFormResult.stream().peek(i -> {
+				if (object.has(i.getPFD_COLUMN_NAME())) {
+					i.setPFD_FLD_VALUE(object.get(i.getPFD_COLUMN_NAME()));
+				}
+				if (i.getPFD_FORM_ITEM_TYPE1().equals("FrontForm")) {
+					frontFormFields.put("Label", i.getPFD_FLD_NAME());
+				}
+			}).collect(Collectors.toMap(LM_FRONT_FORM_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+			frontFormFields.put("formFields", frontFormMap);
+			response.put("frontForm", frontFormFields);
+		}
+		
+		List<LM_ACCORDION_FLD_DEFN> accordionsResult = commonDao.getAccordionResult(
+				parametermap.get("screenCode").toString(), parametermap.get("screenName").toString());
+		List<LM_ACCORDION_FLD_DEFN> allaccordionFields = commonDao.getAccordionFields(
+				parametermap.get("screenCode").toString(), parametermap.get("screenName").toString());
+		List<LM_ACCOTAB_FLD_DEFN> allaccordionTabs = commonDao.getAccoTabs(
+				parametermap.get("screenCode").toString(), parametermap.get("screenName").toString());
+		List<LM_ACCOTAB_FLD_DEFN> allaccordionSubTabs = commonDao.getAccordionSubTabs(
+				parametermap.get("screenCode").toString(), parametermap.get("screenName").toString());
+		List<LM_ACCORDION_FLD_DEFN> allaccordionFieldsDefn = commonDao.getAccordionFieldsDefn(
+				parametermap.get("screenCode").toString(), parametermap.get("screenName").toString());
 		int accTabs = 0;
-		for(int i =0; i<accordionsResult.size(); i++) {
+		for (int i = 0; i < accordionsResult.size(); i++) {
+			int k = i;
 			accTabs = 0;
-			List<LM_ACCORDION_FLD_DEFN> accordionFields = commonDao
-					.getAccordionFields(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString(), accordionsResult.get(i).getPFD_FLD_NAME());
+			List<LM_ACCORDION_FLD_DEFN> accordionFields = allaccordionFields.stream()
+					.filter(item -> item.getPFD_FORM_ITEM_TYPE2().equals(accordionsResult.get(k).getPFD_FLD_NAME()))
+					.collect(Collectors.toList());
 			JSONObject accordionTabsResponse = new JSONObject();
 			accordionTabsResponse.put("Label", accordionsResult.get(i).getPFD_FLD_NAME());
-			for(int j=0; j<accordionFields.size(); j++) {
-				if(accordionFields.get(j).getPFD_FORM_ITEM_TYPE1().equals("AccordionTab")) {
+			for (int j = 0; j < accordionFields.size(); j++) {
+				int l = j;
+				if (accordionFields.get(j).getPFD_FORM_ITEM_TYPE1().equals("AccordionTab")) {
 					JSONObject accordionTabres = new JSONObject();
-					List<LM_ACCOTAB_FLD_DEFN> accordionTabs = commonDao.getAccoTabs(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString(), accordionFields.get(j).getPFD_FLD_NAME());
+					List<LM_ACCOTAB_FLD_DEFN> accordionTabs = allaccordionTabs.stream()
+							.filter(item -> item.getPFD_FORM_ITEM_TYPE2().equals(accordionFields.get(l).getPFD_FLD_NAME()))
+							.collect(Collectors.toList());
 					Map<String, Object> accordionTabsMap = accordionTabs.stream()
 							.collect(Collectors.toMap(LM_ACCOTAB_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
-					List<LM_ACCOTAB_FLD_DEFN> accordionSubTabs = commonDao.getAccordionSubTabs(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString(), accordionFields.get(j).getPFD_FLD_NAME());
+					List<LM_ACCOTAB_FLD_DEFN> accordionSubTabs = allaccordionSubTabs.stream()
+							.filter(item -> item.getPFD_FORM_ITEM_TYPE2().equals(accordionFields.get(l).getPFD_FLD_NAME()))
+							.collect(Collectors.toList());
 					accordionTabres.put("Label", accordionFields.get(j).getPFD_FLD_NAME());
-					if(accordionSubTabs.size() <= 0) {
-					accordionTabres.put("formFields", accordionTabsMap);
+					if (accordionSubTabs.size() <= 0) {
+						accordionTabres.put("formFields", accordionTabsMap);
 					}
-					if(accordionFields.size() > 1) {
+					if (accordionFields.size() > 1) {
 						accTabs = 1;
 					}
 					accordionTabsResponse.put(accordionFields.get(j).getPFD_FLD_NAME(), accordionTabres);
-					
-					if(accordionSubTabs.size() > 0) {
+
+					if (accordionSubTabs.size() > 0) {
 						accordionTabres.put("tabs", parseSubTabs(accordionSubTabs, parametermap, object));
 					}
-				}else if(accordionFields.get(j).getPFD_FORM_ITEM_TYPE1().equals("AccordionForm")) {
-					
-				}else if(accordionFields.get(j).getPFD_FORM_ITEM_TYPE1().equals("AccordionMrv")) {
-					
+				} else if (accordionFields.get(j).getPFD_FORM_ITEM_TYPE1().equals("AccordionForm")) {
+
+				} else if (accordionFields.get(j).getPFD_FORM_ITEM_TYPE1().equals("AccordionMrv")) {
+
 				}
 			}
 			JSONObject tabs = new JSONObject();
-			if(accTabs == 1) {
+			if (accTabs == 1) {
 				tabs.put("tabs", accordionTabsResponse);
-				accordionResponse.put(accordionsResult.get(i).getPFD_FLD_NAME(), tabs);	
+				accordionResponse.put(accordionsResult.get(i).getPFD_FLD_NAME(), tabs);
+			} else {
+				accordionResponse.put(accordionsResult.get(i).getPFD_FLD_NAME(), accordionTabsResponse);
 			}
-			else {
-			accordionResponse.put(accordionsResult.get(i).getPFD_FLD_NAME(), accordionTabsResponse);
-			}
-			List<LM_ACCORDION_FLD_DEFN> accordionFieldsDefn = commonDao.getAccordionFieldsDefn(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString(), accordionsResult.get(i).getPFD_FLD_NAME());
-			if(JSONempty == true) {
-			Map<String, Object> accordionFieldsDefnMap = accordionFieldsDefn.stream()
-					.collect(Collectors.toMap(LM_ACCORDION_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
-			if(accordionFieldsDefn.size() > 1) {
-				tabs.put("Label", accordionsResult.get(i).getPFD_FLD_NAME());
-				tabs.put("formFields", accordionFieldsDefnMap);
-				accordionResponse.put(accordionsResult.get(i).getPFD_FLD_NAME(), tabs);	
-				}
-			}else {
+			List<LM_ACCORDION_FLD_DEFN> accordionFieldsDefn = allaccordionFieldsDefn.stream()
+					.filter(item -> item.getPFD_FORM_ITEM_TYPE2().equals(accordionsResult.get(k).getPFD_FLD_NAME()))
+					.collect(Collectors.toList());
+			if (JSONempty == true) {
 				Map<String, Object> accordionFieldsDefnMap = accordionFieldsDefn.stream()
-						.peek(item -> {
-							if (object.has(item.getPFD_COLUMN_NAME())) {
-								item.setPFD_FLD_VALUE(object.get(item.getPFD_COLUMN_NAME()));
-							}
-						})
 						.collect(Collectors.toMap(LM_ACCORDION_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
-				if(accordionFieldsDefn.size() > 1) {
+				if (accordionFieldsDefn.size() > 1) {
 					tabs.put("Label", accordionsResult.get(i).getPFD_FLD_NAME());
 					tabs.put("formFields", accordionFieldsDefnMap);
-					accordionResponse.put(accordionsResult.get(i).getPFD_FLD_NAME(), tabs);	
-					}				
+					accordionResponse.put(accordionsResult.get(i).getPFD_FLD_NAME(), tabs);
+				}
+			} else {
+				Map<String, Object> accordionFieldsDefnMap = accordionFieldsDefn.stream().peek(item -> {
+					if (object.has(item.getPFD_COLUMN_NAME())) {
+						item.setPFD_FLD_VALUE(object.get(item.getPFD_COLUMN_NAME()));
+					}
+				}).collect(Collectors.toMap(LM_ACCORDION_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+				if (accordionFieldsDefn.size() > 1) {
+					tabs.put("Label", accordionsResult.get(i).getPFD_FLD_NAME());
+					tabs.put("formFields", accordionFieldsDefnMap);
+					accordionResponse.put(accordionsResult.get(i).getPFD_FLD_NAME(), tabs);
+				}
 			}
 			response.put("accordions", accordionResponse);
 		}
-		
+
 		List<MRVKeyValue> mrvFetch = commonDao.getMrvFetchList(parametermap.get("screenName"));
 		response.put("mrvListingId", mrvFetch);
+		List<Integer> list = new ArrayList<>();
+		list.add(1);
+		list.add(2);
 
 		return response.toString();
 	}
 
 	private JSONObject parseSubTabs(List<LM_ACCOTAB_FLD_DEFN> accordionSubTabs, Map<String, Object> parametermap, JSONObject object) {
 		JSONObject accordionTabsResponse = new JSONObject();
+		List<LM_ACCOTAB_FLD_DEFN> allaccordionTabs = commonDao.getAccoTabs(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString());
+		List<LM_ACCOTAB_FLD_DEFN> allaccordionSubTab = commonDao.getAccordionSubTabs(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString());
 		for(int i=0; i<accordionSubTabs.size(); i++) {
+			int s = i;
 			JSONObject accordionTabres = new JSONObject();
-			List<LM_ACCOTAB_FLD_DEFN> accordionTabs = commonDao.getAccoTabs(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString(), accordionSubTabs.get(i).getPFD_FLD_NAME());
+			List<LM_ACCOTAB_FLD_DEFN> accordionTabs = allaccordionTabs.stream()
+					.filter(item -> item.getPFD_FORM_ITEM_TYPE2().equals(accordionSubTabs.get(s).getPFD_FLD_NAME()))
+					.collect(Collectors.toList());
 			if(object.isEmpty() == true) {
 			Map<String, Object> accordionTabsMap = accordionTabs.stream()
 					.collect(Collectors.toMap(LM_ACCOTAB_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
@@ -1000,7 +1018,9 @@ public class CommonServiceImpl implements CommonService {
 					accordionTabres.put("formFields", accordionTabsMap);
 					}
 			}
-			List<LM_ACCOTAB_FLD_DEFN> accordionSubTab = commonDao.getAccordionSubTabs(parametermap.get("screenCode").toString(), parametermap.get("screenName").toString(), accordionSubTabs.get(i).getPFD_FLD_NAME());
+			List<LM_ACCOTAB_FLD_DEFN> accordionSubTab = allaccordionSubTab.stream()
+					.filter(item -> item.getPFD_FORM_ITEM_TYPE2().equals(accordionSubTabs.get(s).getPFD_FLD_NAME()))
+					.collect(Collectors.toList());
 			if(accordionSubTab.size() > 0) {
 				accordionTabres.put("tabs", parseSubTabs(accordionSubTabs, parametermap, object));
 			}
