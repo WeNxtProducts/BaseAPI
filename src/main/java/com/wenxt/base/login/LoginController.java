@@ -111,5 +111,10 @@ public class LoginController {
 	public String getAllDeptSubmit(@RequestBody DeptSubmitRequest deptrequest) {
 		return loginService.getAllDeptSubmit(deptrequest);
 	}
+	
+	@PostMapping("/deptdelete")
+	public String getAllDeptDelete(@RequestBody DeptSubmitRequest user) {
+		return loginService.getAllDeptDelete(user);
+	}
 
 }

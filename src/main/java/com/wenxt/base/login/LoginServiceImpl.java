@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.http.HttpStatus;
-
 import org.jasypt.encryption.StringEncryptor;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,6 +16,7 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.SimpleMailMessage;
@@ -648,7 +647,7 @@ public class LoginServiceImpl implements LoginService {
 	        }
 
 	        // Fetching branch list
-	        url = baseURL + "20";
+	        url = baseURL + "11";
 	        responseEntity = restTemplate.getForEntity(url, String.class);
 	        if (responseEntity.getStatusCode() == HttpStatus.OK) {
 	            String serviceResponse = responseEntity.getBody();
@@ -665,7 +664,7 @@ public class LoginServiceImpl implements LoginService {
 	        }
 
 	        // Fetching department list
-	        url = baseURL + "28";
+	        url = baseURL + "12";
 	        responseEntity = restTemplate.getForEntity(url, String.class);
 	        if (responseEntity.getStatusCode() == HttpStatus.OK) {
 	            String serviceResponse = responseEntity.getBody();
@@ -710,6 +709,8 @@ public class LoginServiceImpl implements LoginService {
 
 	@Override
 	public String getAllDeptSubmit(DeptSubmitRequest deptrequest) {
+		
+		JSONObject response = new JSONObject();
 	    try {
 	        String userId = deptrequest.getUserId();
 	        String companyCode = deptrequest.getCompanyCode();
@@ -717,31 +718,69 @@ public class LoginServiceImpl implements LoginService {
 	        String departmentCode = deptrequest.getDepartmentCode();
 
 	        // Update existing record in LM_MENU_USER_COMP_DIVN table
-	        int updatedRows = template.update("UPDATE LM_MENU_USER_COMP_DIVN " +
+	        int updatedRows = template.update("UPDATE lm_menu_user_comp_divn " +
 	                                          "SET MUCD_DIVN_CODE = ?, MUCD_DEPT_CODE = ? " +
 	                                          "WHERE MUCD_USER_ID = ? AND MUCD_COMP_CODE = ? AND MUCD_DIVN_CODE = ? AND MUCD_DEPT_CODE = ?",
 	                                          divisionCode, departmentCode, userId, companyCode, divisionCode, departmentCode);
 
 	        // If no existing record, insert new record
 	        if (updatedRows == 0) {
-	            template.update("INSERT INTO LM_MENU_USER_COMP_DIVN (MUCD_USER_ID, MUCD_COMP_CODE, MUCD_DIVN_CODE, MUCD_DEPT_CODE) " +
+	            template.update("INSERT INTO lm_menu_user_comp_divn (MUCD_USER_ID, MUCD_COMP_CODE, MUCD_DIVN_CODE, MUCD_DEPT_CODE) " +
 	                            "VALUES (?, ?, ?, ?)", userId, companyCode, divisionCode, departmentCode);
 	        }
 
 	        // Update LM_MENU_USER_COMP table
-	        template.update("UPDATE LM_MENU_USER_COMP SET MUC_COMP_CODE = ? WHERE MUC_USER_ID = ?", companyCode, userId);
+	        template.update("UPDATE lm_menu_user_comp SET MUC_COMP_CODE = ? WHERE MUC_USER_ID = ?", companyCode, userId);
 
 	        // If no existing record, insert new record
-	        int rowCount = template.update("INSERT INTO LM_MENU_USER_COMP (MUC_USER_ID, MUC_COMP_CODE) " +
+	        int rowCount = template.update("INSERT INTO lm_menu_user_comp (MUC_USER_ID, MUC_COMP_CODE) " +
 	                                       "SELECT ?, ? FROM dual WHERE NOT EXISTS " +
-	                                       "(SELECT 1 FROM LM_MENU_USER_COMP WHERE MUC_USER_ID = ?)",
+	                                       "(SELECT 1 FROM lm_menu_user_comp WHERE MUC_USER_ID = ?)",
 	                                       userId, companyCode, userId);
 
-	        return "Data inserted/updated successfully.";
+	        response.put("Status", "SUCCESS");
+	        response.put("messageCode", "Data inserted/updated successfully");
+	        
+	        
 	    } catch (Exception e) {
-	        return "Error occurred: " + e.getMessage();
+	    	 response.put("status", "ERROR");
+	            response.put("message", "Error occurred: " + e.getMessage());
 	    }
+	    
+	    return response.toString();
+	}
+
+	@Override
+	public String getAllDeptDelete(DeptSubmitRequest user) {
+	
+	        JSONObject response = new JSONObject();
+	        try {
+	            String userId = user.getUserId();
+	            String companyCode = user.getCompanyCode();
+	            String divisionCode = user.getDivisionCode();
+	            String departmentCode = user.getDepartmentCode();
+
+	            // Delete record from LM_MENU_USER_COMP_DIVN table
+	            int deletedRows = template.update("DELETE FROM lm_menu_user_comp_divn " +
+	                                              "WHERE MUCD_USER_ID = ? AND MUCD_COMP_CODE = ? AND MUCD_DIVN_CODE = ? AND MUCD_DEPT_CODE = ?",
+	                                              userId, companyCode, divisionCode, departmentCode);
+
+	            if (deletedRows > 0) {
+	                response.put("status", "SUCCESS");
+	                response.put("message", "Data deleted successfully");
+	            } else {
+	                response.put("status", "ERROR");
+	                response.put("message", "No record found to delete");
+	            }
+	        } catch (Exception e) {
+	            response.put("status", "ERROR");
+	            response.put("message", "Error occurred: " + e.getMessage());
+	        }
+	        
+	        return response.toString();
+	    }
+	
 	}
 
 
-}
+

@@ -29,4 +29,6 @@ public interface LoginService {
 
 	public String getAllDeptSubmit(DeptSubmitRequest deptrequest);
 
+	public String getAllDeptDelete(DeptSubmitRequest user);
+
 }
