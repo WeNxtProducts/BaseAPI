@@ -572,7 +572,7 @@ public class LoginServiceImpl implements LoginService {
 
 		JSONObject response = new JSONObject();
 		RestTemplate restTemplate = new RestTemplate();
-		String url = getBaseURL + "common/getparamlov?queryId=";
+		String url = getBaseURL + "common/getparamlov?queryId=19&muc_user_id=" + user.getUserId();
 		ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
 		if (responseEntity.getStatusCode() == HttpStatus.OK) {
 			String serviceResponse = responseEntity.getBody();
@@ -630,7 +630,8 @@ public class LoginServiceImpl implements LoginService {
 
 	    try {
 	        // Fetching country list
-	        String url = baseURL + "19";
+	        String url = baseURL + "19" + "&muc_user_id=" + user.getUserId();
+
 	        ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
 	        if (responseEntity.getStatusCode() == HttpStatus.OK) {
 	            String serviceResponse = responseEntity.getBody();
@@ -647,7 +648,10 @@ public class LoginServiceImpl implements LoginService {
 	        }
 
 	        // Fetching branch list
-	        url = baseURL + "11";
+//	        url = baseURL + "20" + "MUCD_COMP_CODE=" + user.getCompanyCode();
+	        
+	        url = baseURL + "20" + "&MUCD_COMP_CODE=" + user.getCompanyCode();
+
 	        responseEntity = restTemplate.getForEntity(url, String.class);
 	        if (responseEntity.getStatusCode() == HttpStatus.OK) {
 	            String serviceResponse = responseEntity.getBody();
@@ -664,7 +668,8 @@ public class LoginServiceImpl implements LoginService {
 	        }
 
 	        // Fetching department list
-	        url = baseURL + "12";
+	        url = baseURL + "20" + "&MUCD_COMP_CODE=" + user.getCompanyCode();
+
 	        responseEntity = restTemplate.getForEntity(url, String.class);
 	        if (responseEntity.getStatusCode() == HttpStatus.OK) {
 	            String serviceResponse = responseEntity.getBody();
@@ -679,8 +684,6 @@ public class LoginServiceImpl implements LoginService {
 	        } else {
 	            throw new UsernameNotFoundException("Error fetching department list");
 	        }
-
-	        // Business logic with KieSession (if needed)
 
 	        // Response construction
 	        response.put("statusCode", "successCode");
@@ -697,16 +700,16 @@ public class LoginServiceImpl implements LoginService {
 
 	    return response.toString();
 	}
-	private List<LOVDTO> parseLOVDTOList(JSONArray jsonArray) {
-        List<LOVDTO> list = new ArrayList<>();
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject obj = jsonArray.getJSONObject(i);
-            LOVDTO model = new LOVDTO(obj.getString("label"), obj.getString("value")); // Assuming model structure
-            list.add(model);
-        }
-        return list;
-    }
 
+	private List<LOVDTO> parseLOVDTOList(JSONArray jsonArray) {
+	    List<LOVDTO> list = new ArrayList<>();
+	    for (int i = 0; i < jsonArray.length(); i++) {
+	        JSONObject obj = jsonArray.getJSONObject(i);
+	        LOVDTO model = new LOVDTO(obj.getString("label"), obj.getString("value")); // Assuming model structure
+	        list.add(model);
+	    }
+	    return list;
+	}
 	@Override
 	public String getAllDeptSubmit(DeptSubmitRequest deptrequest) {
 		
