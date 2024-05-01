@@ -245,6 +245,13 @@ public class UserMasterServiceImpl implements UserMasterService {
 			        newUser.setUser_ins_Dt(existingUser.getUser_ins_Dt());
 			    }
 			    
+			    if (newUser.getUser_passwd() != null && !newUser.getUser_passwd().isEmpty()) {
+			        newUser.setUser_passwd(encryptor.encrypt(userPasswd));
+			    }
+			    
+			   
+
+			    newUser.setUser_passwd(encryptor.encrypt(userPasswd));
 			    newUser.setUser_ins_id(existingUser.getUserId());
 			    newUser.setUser_mod_Dt(currentDate);
 			    userrepo.save(newUser);

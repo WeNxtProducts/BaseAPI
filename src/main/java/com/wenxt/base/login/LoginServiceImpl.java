@@ -686,15 +686,15 @@ public class LoginServiceImpl implements LoginService {
 	        }
 
 	        // Response construction
-	        response.put("statusCode", "successCode");
-	        response.put("messageCode", "getCompanyMessage");
+	        response.put("Status", "SUCCESS");
+	        response.put("status_msg", "getCompanyMessage");
 	        response.put("companyList", user.getCompanyListCodes());
 	        response.put("branchList", user.getBranchListCodes());
 	        response.put("departmentList", user.getDeptListCodes());
 
 	    } catch (Exception e) {
-	        response.put("statusCode", "errorCode");
-	        response.put("stsmsg", "Error occurred");
+	        response.put("Status", "errorCode");
+	        response.put("status_msg", "Error occurred");
 	        response.put("error", e.getMessage());
 	    }
 
