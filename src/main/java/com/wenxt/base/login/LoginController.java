@@ -27,9 +27,6 @@ public class LoginController {
 	@Autowired
 	private JwtService jwtService;
 
-//	@Autowired
-//	private AuthenticationManager authenticationManager;
-
 	@PostMapping("/login")
 	public String login(@RequestBody LoginRequestModel login) {
 		return loginService.login(login);
@@ -106,15 +103,14 @@ public class LoginController {
 	public String getAllDeptListByUser(@RequestBody LoginDropDownRequestModel user) {
 		return loginService.getAllDeptListByUser(user);
 	}
-	
+
 	@PostMapping("/deptsubmit")
 	public String getAllDeptSubmit(@RequestBody DeptSubmitRequest deptrequest) {
 		return loginService.getAllDeptSubmit(deptrequest);
 	}
-	
-//	@PostMapping("/deptdelete")
-//	public String getAllDeptDelete(@RequestBody DeptSubmitRequest user) {
-//		return loginService.getAllDeptDelete(user);
-//	}
 
+	@PostMapping("/deptdelete")
+	public String deleteDeptSubmit(@RequestBody DeptSubmitRequest request) {
+		return loginService.getAllDeptDelete(request);
+	}
 }

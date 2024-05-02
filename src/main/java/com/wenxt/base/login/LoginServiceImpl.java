@@ -31,11 +31,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.wenxt.base.commonUtils.LOVDTO;
+import com.wenxt.base.model.LM_MENU_USER_COMP_DIVN;
 import com.wenxt.base.repository.LmMenuUserCompDivnReposistory;
 import com.wenxt.base.security.AuthRequest;
 import com.wenxt.base.security.JwtService;
 import com.wenxt.base.userMaster.LM_MENU_USERS;
 import com.wenxt.base.userMaster.UserMasterRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -797,32 +800,47 @@ public class LoginServiceImpl implements LoginService {
 		return response.toString();
 	}
 
-//	@Override
-//	public String getAllDeptDelete(DeptSubmitRequest user) {
-//
-//		JSONObject response = new JSONObject();
-//
-//		try {
-//			String userId = user.getUserId();
-//			String companyCode = user.getCompanyCode();
-//			String divisionCode = user.getDivisionCode();
-//			String departmentCode = user.getDepartmentCode();
-//
-//			// Delete LM_MENU_USER_COMP record
-//			repo.deleteByUserIdAndMucCompCode(userId, companyCode);
-//
-//			// Delete LM_MENU_USER_COMP_DIVN record
-//			lmmenuuserCompdivrepo.deleteByUserIdAndCompCodeAndDivnCodeAndDeptCode(userId, companyCode, divisionCode,
-//					departmentCode);
-//
-//			response.put("status", "SUCCESS");
-//			response.put("message", "LM menu company and division deleted successfully");
-//		} catch (Exception e) {
-//			response.put("status", "ERROR");
-//			response.put("message", "Error occurred: " + e.getMessage());
-//		}
-//
-//		return response.toString();
-//	}
+	@Transactional
+
+	public String getAllDeptDelete(DeptSubmitRequest user) {
+		JSONObject response = new JSONObject();
+
+		try {
+			String userId = user.getUserId();
+			String companyCode = user.getCompanyCode();
+			String divisionCode = user.getDivisionCode();
+			String departmentCode = user.getDepartmentCode();
+
+			// Check if records exist before deletion
+			LM_MENU_USER_COMP existingComp = null;
+			if (user.getCompId() != null) {
+				existingComp = repo.findById(user.getCompId()).orElse(null);
+			}
+			LM_MENU_USER_COMP_DIVN existingCompDivn = lmmenuuserCompdivrepo.findByuserIdAndCompCode(userId,
+					companyCode);
+
+			if (existingComp == null || existingCompDivn == null) {
+				response.put("status", "ERROR");
+				response.put("message", "Records not found for deletion");
+				return response.toString();
+			}
+
+			// Delete records in LM_MENU_USER_COMP table
+			repo.deleteByUserIdAndCompCode(userId, companyCode);
+
+			// Delete records in LM_MENU_USER_COMP_DIVN table
+			lmmenuuserCompdivrepo.deleteByUserIdAndCompCodeAndDivnCodeAndDeptCode(userId, companyCode, divisionCode,
+					departmentCode);
+
+			response.put("status", "SUCCESS");
+			response.put("message", "LM menu company and division deleted successfully");
+		} catch (Exception e) {
+			response.put("status", "ERROR");
+			response.put("message", "Error occurred: " + e.getMessage());
+			e.printStackTrace(); // Log the exception for debugging
+		}
+
+		return response.toString();
+	}
 
 }
