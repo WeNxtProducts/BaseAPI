@@ -1,14 +1,21 @@
 package com.wenxt.base.login;
 
+import com.wenxt.base.userMaster.LM_MENU_USERS;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class LM_MENU_USER_COMP
 {
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "muc_id")
 	private int _muc_id;
 	public int getmuc_id()
@@ -20,15 +27,14 @@ public class LM_MENU_USER_COMP
 		this._muc_id = value;
 	}
 
-	@Column(name = "muc_user_id")
-	private String _muc_user_id;
-	public String getmuc_user_id()
-	{
-		return this._muc_user_id;
+	@ManyToOne
+	@JoinColumn(name = "muc_user_id")
+	private LM_MENU_USERS muc_user_id;
+	public LM_MENU_USERS getMuc_user_id() {
+		return muc_user_id;
 	}
-	public void setmuc_user_id(String value)
-	{
-		this._muc_user_id = value;
+	public void setMuc_user_id(LM_MENU_USERS muc_user_id) {
+		this.muc_user_id = muc_user_id;
 	}
 
 	@Column(name = "muc_comp_code")
@@ -87,14 +93,14 @@ public class LM_MENU_USER_COMP
 	}
 
 	@Column(name = "muc_role_sys_id")
-	private double _muc_role_sys_id;
-	public double getmuc_role_sys_id()
-	{
-		return this._muc_role_sys_id;
+	private Double _muc_role_sys_id;
+	
+
+	public Double get_muc_role_sys_id() {
+		return _muc_role_sys_id;
 	}
-	public void setmuc_role_sys_id(double value)
-	{
-		this._muc_role_sys_id = value;
+	public void set_muc_role_sys_id(Double _muc_role_sys_id) {
+		this._muc_role_sys_id = _muc_role_sys_id;
 	}
 
 	@Column(name = "muc_client_id")
@@ -140,5 +146,7 @@ public class LM_MENU_USER_COMP
 	{
 		this._muc_dflt_yn = value;
 	}
+	
+	
 
 }

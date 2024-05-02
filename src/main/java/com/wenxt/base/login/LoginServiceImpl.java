@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.wenxt.base.commonUtils.LOVDTO;
+import com.wenxt.base.repository.LmMenuUserCompDivnReposistory;
 import com.wenxt.base.security.AuthRequest;
 import com.wenxt.base.security.JwtService;
 import com.wenxt.base.userMaster.LM_MENU_USERS;
@@ -107,11 +108,12 @@ public class LoginServiceImpl implements LoginService {
 
 	@Value("${spring.data.code}")
 	private String dataCode;
-	
+
 	@Autowired
 	private JdbcTemplate template;
-	
-	
+
+	@Autowired
+	LmMenuUserCompDivnReposistory lmmenuuserCompdivrepo;
 
 	@Override
 	public String getCompany(LoginDropDownRequestModel user) {
@@ -621,169 +623,206 @@ public class LoginServiceImpl implements LoginService {
 		}
 
 	}
-	
+
 	@Override
 	public String getAllDeptListByUser(LoginDropDownRequestModel user) {
-	    JSONObject response = new JSONObject();
-	    RestTemplate restTemplate = new RestTemplate();
-	    String baseURL = getBaseURL + "common/getparamlov?queryId=";
+		JSONObject response = new JSONObject();
+		RestTemplate restTemplate = new RestTemplate();
+		String baseURL = getBaseURL + "common/getparamlov?queryId=";
 
-	    try {
-	        // Fetching country list
-	        String url = baseURL + "19" + "&muc_user_id=" + user.getUserId();
+		try {
+			// Fetching country list
+			String url = baseURL + "19";
 
-	        ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
-	        if (responseEntity.getStatusCode() == HttpStatus.OK) {
-	            String serviceResponse = responseEntity.getBody();
-	            JSONArray jsonArray = null;
-	            try {
-	                jsonArray = new JSONObject(serviceResponse).getJSONArray("Data");
-	            } catch (JSONException e) {
-	                throw new UsernameNotFoundException("Data not found in the response");
-	            }
-	            List<LOVDTO> countryList = parseLOVDTOList(jsonArray);
-	            user.setCompanyListCodes(countryList);
-	        } else {
-	            throw new UsernameNotFoundException("Error fetching country list");
-	        }
+			ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
+			if (responseEntity.getStatusCode() == HttpStatus.OK) {
+				String serviceResponse = responseEntity.getBody();
+				JSONArray jsonArray = null;
+				try {
+					jsonArray = new JSONObject(serviceResponse).getJSONArray("Data");
+				} catch (JSONException e) {
+					throw new UsernameNotFoundException("Data not found in the response");
+				}
+				List<LOVDTO> countryList = parseLOVDTOList(jsonArray);
+				user.setCompanyListCodes(countryList);
+			} else {
+				throw new UsernameNotFoundException("Error fetching country list");
+			}
 
-	        // Fetching branch list
+			// Fetching branch list
 //	        url = baseURL + "20" + "MUCD_COMP_CODE=" + user.getCompanyCode();
-	        
-	        url = baseURL + "20" + "&MUCD_COMP_CODE=" + user.getCompanyCode();
 
-	        responseEntity = restTemplate.getForEntity(url, String.class);
-	        if (responseEntity.getStatusCode() == HttpStatus.OK) {
-	            String serviceResponse = responseEntity.getBody();
-	            JSONArray jsonArray = null;
-	            try {
-	                jsonArray = new JSONObject(serviceResponse).getJSONArray("Data");
-	            } catch (JSONException e) {
-	                throw new UsernameNotFoundException("Data not found in the response");
-	            }
-	            List<LOVDTO> branchList = parseLOVDTOList(jsonArray);
-	            user.setBranchListCodes(branchList);
-	        } else {
-	            throw new UsernameNotFoundException("Error fetching branch list");
-	        }
+			url = baseURL + "20" + "&MUCD_COMP_CODE=" + user.getCompanyCode();
 
-	        // Fetching department list
-	        url = baseURL + "20" + "&MUCD_COMP_CODE=" + user.getCompanyCode();
+			responseEntity = restTemplate.getForEntity(url, String.class);
+			if (responseEntity.getStatusCode() == HttpStatus.OK) {
+				String serviceResponse = responseEntity.getBody();
+				JSONArray jsonArray = null;
+				try {
+					jsonArray = new JSONObject(serviceResponse).getJSONArray("Data");
+				} catch (JSONException e) {
+					throw new UsernameNotFoundException("Data not found in the response");
+				}
+				List<LOVDTO> branchList = parseLOVDTOList(jsonArray);
+				user.setBranchListCodes(branchList);
+			} else {
+				throw new UsernameNotFoundException("Error fetching branch list");
+			}
 
-	        responseEntity = restTemplate.getForEntity(url, String.class);
-	        if (responseEntity.getStatusCode() == HttpStatus.OK) {
-	            String serviceResponse = responseEntity.getBody();
-	            JSONArray jsonArray = null;
-	            try {
-	                jsonArray = new JSONObject(serviceResponse).getJSONArray("Data");
-	            } catch (JSONException e) {
-	                throw new UsernameNotFoundException("Data not found in the response");
-	            }
-	            List<LOVDTO> departmentList = parseLOVDTOList(jsonArray);
-	            user.setDeptListCodes(departmentList);
-	        } else {
-	            throw new UsernameNotFoundException("Error fetching department list");
-	        }
+			// Fetching department list
+			url = baseURL + "28" + "&MUCD_COMP_CODE=" + user.getCompanyCode();
 
-	        // Response construction
-	        response.put("Status", "SUCCESS");
-	        response.put("status_msg", "getCompanyMessage");
-	        response.put("companyList", user.getCompanyListCodes());
-	        response.put("branchList", user.getBranchListCodes());
-	        response.put("departmentList", user.getDeptListCodes());
+			responseEntity = restTemplate.getForEntity(url, String.class);
+			if (responseEntity.getStatusCode() == HttpStatus.OK) {
+				String serviceResponse = responseEntity.getBody();
+				JSONArray jsonArray = null;
+				try {
+					jsonArray = new JSONObject(serviceResponse).getJSONArray("Data");
+				} catch (JSONException e) {
+					throw new UsernameNotFoundException("Data not found in the response");
+				}
+				List<LOVDTO> departmentList = parseLOVDTOList(jsonArray);
+				user.setDeptListCodes(departmentList);
+			} else {
+				throw new UsernameNotFoundException("Error fetching department list");
+			}
 
-	    } catch (Exception e) {
-	        response.put("Status", "errorCode");
-	        response.put("status_msg", "Error occurred");
-	        response.put("error", e.getMessage());
-	    }
+			// Response construction
+			response.put("Status", "SUCCESS");
+			response.put("status_msg", "getCompanyMessage");
+			response.put("companyList", user.getCompanyListCodes());
+			response.put("branchList", user.getBranchListCodes());
+			response.put("departmentList", user.getDeptListCodes());
 
-	    return response.toString();
+		} catch (Exception e) {
+			response.put("Status", "errorCode");
+			response.put("status_msg", "Error occurred");
+			response.put("error", e.getMessage());
+		}
+
+		return response.toString();
 	}
 
 	private List<LOVDTO> parseLOVDTOList(JSONArray jsonArray) {
-	    List<LOVDTO> list = new ArrayList<>();
-	    for (int i = 0; i < jsonArray.length(); i++) {
-	        JSONObject obj = jsonArray.getJSONObject(i);
-	        LOVDTO model = new LOVDTO(obj.getString("label"), obj.getString("value")); // Assuming model structure
-	        list.add(model);
-	    }
-	    return list;
+		List<LOVDTO> list = new ArrayList<>();
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject obj = jsonArray.getJSONObject(i);
+			LOVDTO model = new LOVDTO(obj.getString("label"), obj.getString("value")); // Assuming model structure
+			list.add(model);
+		}
+		return list;
 	}
+
 	@Override
 	public String getAllDeptSubmit(DeptSubmitRequest deptrequest) {
-		
 		JSONObject response = new JSONObject();
-	    try {
-	        String userId = deptrequest.getUserId();
-	        String companyCode = deptrequest.getCompanyCode();
-	        String divisionCode = deptrequest.getDivisionCode();
-	        String departmentCode = deptrequest.getDepartmentCode();
 
-	        // Update existing record in LM_MENU_USER_COMP_DIVN table
-	        int updatedRows = template.update("UPDATE lm_menu_user_comp_divn " +
-	                                          "SET MUCD_DIVN_CODE = ?, MUCD_DEPT_CODE = ? " +
-	                                          "WHERE MUCD_USER_ID = ? AND MUCD_COMP_CODE = ? AND MUCD_DIVN_CODE = ? AND MUCD_DEPT_CODE = ?",
-	                                          divisionCode, departmentCode, userId, companyCode, divisionCode, departmentCode);
+		try {
+			String userId = deptrequest.getUserId();
+			String companyCode = deptrequest.getCompanyCode();
+			String divisionCode = deptrequest.getDivisionCode();
+			String departmentCode = deptrequest.getDepartmentCode();
 
-	        // If no existing record, insert new record
-	        if (updatedRows == 0) {
-	            template.update("INSERT INTO lm_menu_user_comp_divn (MUCD_USER_ID, MUCD_COMP_CODE, MUCD_DIVN_CODE, MUCD_DEPT_CODE) " +
-	                            "VALUES (?, ?, ?, ?)", userId, companyCode, divisionCode, departmentCode);
-	        }
+			// Update or create LM_MENU_USER_COMP record
 
-	        // Update LM_MENU_USER_COMP table
-	        template.update("UPDATE lm_menu_user_comp SET MUC_COMP_CODE = ? WHERE MUC_USER_ID = ?", companyCode, userId);
+			LM_MENU_USER_COMP existingComp = null;
+			if (deptrequest.getCompId() != null) {
+				existingComp = repo.findById(deptrequest.getCompId()).orElse(null);
+			}
+			String divnUserId = null;
+			String divnCompCode = null;
 
-	        // If no existing record, insert new record
-	        int rowCount = template.update("INSERT INTO lm_menu_user_comp (MUC_USER_ID, MUC_COMP_CODE) " +
-	                                       "SELECT ?, ? FROM dual WHERE NOT EXISTS " +
-	                                       "(SELECT 1 FROM lm_menu_user_comp WHERE MUC_USER_ID = ?)",
-	                                       userId, companyCode, userId);
+			if (existingComp != null) {
+				divnCompCode = existingComp.getmuc_comp_code();
+				divnUserId = existingComp.getMuc_user_id().getUserId();
+				Optional<LM_MENU_USERS> user = userrepo.findById(userId);
+				if (user.get() != null) {
 
-	        response.put("Status", "SUCCESS");
-	        response.put("messageCode", "Data inserted/updated successfully");
-	        
-	        
-	    } catch (Exception e) {
-	    	 response.put("status", "ERROR");
-	            response.put("message", "Error occurred: " + e.getMessage());
-	    }
-	    
-	    return response.toString();
+					existingComp.setMuc_user_id(user.get());
+				}
+				existingComp.setmuc_comp_code(companyCode);
+				repo.save(existingComp);
+				response.put("status", "SUCCESS");
+				response.put("message", "LM menu company updated successfully");
+			} else {
+				LM_MENU_USER_COMP newComp = new LM_MENU_USER_COMP();
+				Optional<LM_MENU_USERS> user = userrepo.findById(userId);
+				if (user.get() != null) {
+					newComp.setMuc_user_id(user.get());
+				}
+				newComp.setmuc_comp_code(companyCode);
+				repo.save(newComp);
+				response.put("status", "SUCCESS");
+				response.put("message", "LM menu company created successfully");
+			}
+
+			// Update or create LM_MENU_USER_COMP_DIVN record
+			com.wenxt.base.model.LM_MENU_USER_COMP_DIVN existingCompDivn = lmmenuuserCompdivrepo
+					.findByuserIdAndCompCode(divnUserId, divnCompCode);
+			if (existingCompDivn != null) {
+				Optional<LM_MENU_USERS> user = userrepo.findById(userId);
+				if (user.get() != null) {
+					System.out.println(user.get().getUserId());
+					existingCompDivn.setMucd_user_id(user.get());
+				}
+				System.out.println(existingCompDivn.getMucd_id());
+				existingCompDivn.setMucd_comp_code(companyCode);
+
+				existingCompDivn.setMucd_divn_code(divisionCode);
+				existingCompDivn.setMucd_dept_code(departmentCode);
+				// Set other fields if needed
+				lmmenuuserCompdivrepo.save(existingCompDivn);
+				response.put("status", "SUCCESS");
+				response.put("message", "LM menu company divn updated successfully");
+			} else {
+				com.wenxt.base.model.LM_MENU_USER_COMP_DIVN newCompDivn = new com.wenxt.base.model.LM_MENU_USER_COMP_DIVN();
+				Optional<LM_MENU_USERS> user = userrepo.findById(userId);
+				if (user.get() != null) {
+					newCompDivn.setMucd_user_id(user.get());
+				}
+				newCompDivn.setMucd_comp_code(companyCode);
+
+				newCompDivn.setMucd_divn_code(divisionCode);
+				newCompDivn.setMucd_dept_code(departmentCode);
+				// Set other fields if needed
+				lmmenuuserCompdivrepo.save(newCompDivn);
+				response.put("status", "SUCCESS");
+				response.put("message", "LM menu company divn created successfully");
+			}
+		} catch (Exception e) {
+			response.put("status", "ERROR");
+			response.put("message", "Error occurred: " + e.getMessage());
+		}
+
+		return response.toString();
 	}
 
-	@Override
-	public String getAllDeptDelete(DeptSubmitRequest user) {
-	
-	        JSONObject response = new JSONObject();
-	        try {
-	            String userId = user.getUserId();
-	            String companyCode = user.getCompanyCode();
-	            String divisionCode = user.getDivisionCode();
-	            String departmentCode = user.getDepartmentCode();
+//	@Override
+//	public String getAllDeptDelete(DeptSubmitRequest user) {
+//
+//		JSONObject response = new JSONObject();
+//
+//		try {
+//			String userId = user.getUserId();
+//			String companyCode = user.getCompanyCode();
+//			String divisionCode = user.getDivisionCode();
+//			String departmentCode = user.getDepartmentCode();
+//
+//			// Delete LM_MENU_USER_COMP record
+//			repo.deleteByUserIdAndMucCompCode(userId, companyCode);
+//
+//			// Delete LM_MENU_USER_COMP_DIVN record
+//			lmmenuuserCompdivrepo.deleteByUserIdAndCompCodeAndDivnCodeAndDeptCode(userId, companyCode, divisionCode,
+//					departmentCode);
+//
+//			response.put("status", "SUCCESS");
+//			response.put("message", "LM menu company and division deleted successfully");
+//		} catch (Exception e) {
+//			response.put("status", "ERROR");
+//			response.put("message", "Error occurred: " + e.getMessage());
+//		}
+//
+//		return response.toString();
+//	}
 
-	            // Delete record from LM_MENU_USER_COMP_DIVN table
-	            int deletedRows = template.update("DELETE FROM lm_menu_user_comp_divn " +
-	                                              "WHERE MUCD_USER_ID = ? AND MUCD_COMP_CODE = ? AND MUCD_DIVN_CODE = ? AND MUCD_DEPT_CODE = ?",
-	                                              userId, companyCode, divisionCode, departmentCode);
-
-	            if (deletedRows > 0) {
-	                response.put("status", "SUCCESS");
-	                response.put("message", "Data deleted successfully");
-	            } else {
-	                response.put("status", "ERROR");
-	                response.put("message", "No record found to delete");
-	            }
-	        } catch (Exception e) {
-	            response.put("status", "ERROR");
-	            response.put("message", "Error occurred: " + e.getMessage());
-	        }
-	        
-	        return response.toString();
-	    }
-	
-	}
-
-
-
+}

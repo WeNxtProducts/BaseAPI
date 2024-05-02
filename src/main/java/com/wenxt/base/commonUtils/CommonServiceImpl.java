@@ -621,7 +621,7 @@ public class CommonServiceImpl implements CommonService {
 				}
 			}
 		}
-		List<Map<String, Object>> queryResult = commonDao.getMrvListing(query.getQM_QUERY(), parameters);
+		List<Map<String, Object>> queryResult = commonDao.getMrvListing(query.getQM_QUERY(), parames);
 		Map<String, Object> firstRow = queryResult.get(0);
 		Set<String> columnNames = firstRow.keySet();
 		JSONObject heading = new JSONObject();
@@ -881,7 +881,7 @@ public class CommonServiceImpl implements CommonService {
 				if (i.getPFD_FORM_ITEM_TYPE1().equals("FrontForm")) {
 					frontFormFields.put("Label", i.getPFD_FLD_NAME());
 				}
-			}).collect(Collectors.toMap(LM_FRONT_FORM_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+			}).filter(item -> item.getPFD_FORM_ITEM_TYPE1().equals("FrontFormField")).collect(Collectors.toMap(LM_FRONT_FORM_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
 			frontFormFields.put("formFields", frontFormMap);
 			response.put("frontForm", frontFormFields);
 		} else {
@@ -892,7 +892,7 @@ public class CommonServiceImpl implements CommonService {
 				if (i.getPFD_FORM_ITEM_TYPE1().equals("FrontForm")) {
 					frontFormFields.put("Label", i.getPFD_FLD_NAME());
 				}
-			}).collect(Collectors.toMap(LM_FRONT_FORM_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
+			}).filter(item -> item.getPFD_FORM_ITEM_TYPE1().equals("FrontFormField")).collect(Collectors.toMap(LM_FRONT_FORM_FLD_DEFN::getPFD_COLUMN_NAME, Function.identity()));
 			frontFormFields.put("formFields", frontFormMap);
 			response.put("frontForm", frontFormFields);
 		}

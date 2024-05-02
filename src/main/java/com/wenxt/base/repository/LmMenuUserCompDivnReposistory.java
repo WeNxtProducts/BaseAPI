@@ -1,0 +1,17 @@
+package com.wenxt.base.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import com.wenxt.base.model.LM_MENU_USER_COMP_DIVN;
+
+@Repository
+public interface LmMenuUserCompDivnReposistory extends JpaRepository<LM_MENU_USER_COMP_DIVN, Integer> {
+
+	@Query("Select e From LM_MENU_USER_COMP_DIVN e WHERE e.mucd_user_id.userId = :userId AND e.mucd_comp_code = :compCode")
+	public LM_MENU_USER_COMP_DIVN findByuserIdAndCompCode(@Param("userId") String userId,
+			@Param("compCode") String compCode);
+
+}

@@ -152,7 +152,7 @@ public class LM_MENU_USERS {
 	
 	@Column(name="user_expiry_dt")
 	@Nullable
-	private String	user_expiry_dt;
+	private LocalDateTime	user_expiry_dt;
 	
 	@Column(name="user_first_login_yn")
 	private Boolean userFirstLoginyn;
@@ -370,12 +370,6 @@ public class LM_MENU_USERS {
 	public void setUser_fax_no(String user_fax_no) {
 		this.user_fax_no = user_fax_no;
 	}
-	public short getUser_login_count() {
-		return user_login_count;
-	}
-	public void setUser_login_count(short user_login_count) {
-		this.user_login_count = user_login_count;
-	}
 	public String getUser_ext_yn() {
 		return user_ext_yn;
 	}
@@ -388,11 +382,8 @@ public class LM_MENU_USERS {
 	public void setUser_vps(String user_vps) {
 		this.user_vps = user_vps;
 	}
-	public short getUser_copies() {
+	public Short getUser_copies() {
 		return user_copies;
-	}
-	public void setUser_copies(short user_copies) {
-		this.user_copies = user_copies;
 	}
 	public String getUser_prn_code() {
 		return user_prn_code;
@@ -503,16 +494,23 @@ public class LM_MENU_USERS {
 	public void setUser_passwd_expiry_yn(String user_passwd_expiry_yn) {
 		this.user_passwd_expiry_yn = user_passwd_expiry_yn;
 	}
-	public String getUser_expiry_dt() {
-		return user_expiry_dt;
-	}
-	public void setUser_expiry_dt(String user_expiry_dt) {
-		this.user_expiry_dt = user_expiry_dt;
-	}
+	
 
 	
 	
 	
+	public LocalDateTime getUser_expiry_dt() {
+		return user_expiry_dt;
+	}
+	public void setUser_expiry_dt(LocalDateTime user_expiry_dt) {
+		this.user_expiry_dt = user_expiry_dt;
+	}
+	public void setUser_login_count(Short user_login_count) {
+		this.user_login_count = user_login_count;
+	}
+	public void setUser_copies(Short user_copies) {
+		this.user_copies = user_copies;
+	}
 	public Boolean getUserFirstLoginyn() {
 		return userFirstLoginyn;
 	}
@@ -699,6 +697,10 @@ public class LM_MENU_USERS {
 	public void setUser_warning_days(Double user_warning_days) {
 		this.user_warning_days = user_warning_days;
 	}
+	public Short getUser_login_count() {
+		return user_login_count;
+	}
+
 	
 	
 

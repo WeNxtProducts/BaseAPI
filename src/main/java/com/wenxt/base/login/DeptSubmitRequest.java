@@ -8,10 +8,20 @@ public class DeptSubmitRequest {
 	private String divisionCode;
 	private String departmentCode;
 	
+	private Integer compId;
+	
 	
 
 	public String getUserId() {
 		return userId;
+	}
+
+	public Integer getCompId() {
+		return compId;
+	}
+
+	public void setCompId(Integer compId) {
+		this.compId = compId;
 	}
 
 	public void setUserId(String userId) {
