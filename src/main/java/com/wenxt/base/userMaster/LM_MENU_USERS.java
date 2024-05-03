@@ -151,8 +151,7 @@ public class LM_MENU_USERS {
 	private String	user_passwd_expiry_yn;
 	
 	@Column(name="user_expiry_dt")
-	@Nullable
-	private LocalDateTime	user_expiry_dt;
+	private LocalDateTime user_expiry_dt;
 	
 	@Column(name="user_first_login_yn")
 	private Boolean userFirstLoginyn;
@@ -439,12 +438,6 @@ public class LM_MENU_USERS {
 	public void setUser_administrator_yn(String user_administrator_yn) {
 		this.user_administrator_yn = user_administrator_yn;
 	}
-//	public String getUser_email_id() {
-//		return user_email_id;
-//	}
-//	public void setUser_email_id(String user_email_id) {
-//		this.user_email_id = user_email_id;
-//	}
 	
 	public String getUser_mobile_no() {
 		return user_mobile_no;
