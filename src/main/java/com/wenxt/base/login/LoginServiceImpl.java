@@ -655,7 +655,7 @@ public class LoginServiceImpl implements LoginService {
 			// Fetching branch list
 //	        url = baseURL + "20" + "MUCD_COMP_CODE=" + user.getCompanyCode();
 
-			url = baseURL + "20" + "&MUCD_COMP_CODE=" + user.getCompanyCode();
+			url = baseURL + "20" + "&dept_comp_code=" + user.getCompanyCode();
 
 			responseEntity = restTemplate.getForEntity(url, String.class);
 			if (responseEntity.getStatusCode() == HttpStatus.OK) {
@@ -673,7 +673,7 @@ public class LoginServiceImpl implements LoginService {
 			}
 
 			// Fetching department list
-			url = baseURL + "28" + "&MUCD_COMP_CODE=" + user.getCompanyCode();
+			url = baseURL + "28" + "&dept_comp_code=" + user.getBranchCode();
 
 			responseEntity = restTemplate.getForEntity(url, String.class);
 			if (responseEntity.getStatusCode() == HttpStatus.OK) {
@@ -691,15 +691,15 @@ public class LoginServiceImpl implements LoginService {
 			}
 
 			// Response construction
-			response.put("Status", "SUCCESS");
-			response.put("status_msg", "getCompanyMessage");
+			response.put(statusCode, successCode);
+			response.put(messageCode, "getCompanyMessage");
 			response.put("companyList", user.getCompanyListCodes());
 			response.put("branchList", user.getBranchListCodes());
 			response.put("departmentList", user.getDeptListCodes());
 
 		} catch (Exception e) {
-			response.put("Status", "errorCode");
-			response.put("status_msg", "Error occurred");
+			response.put(statusCode, errorCode);
+			response.put(messageCode, "Error occurred");
 			response.put("error", e.getMessage());
 		}
 
@@ -723,7 +723,7 @@ public class LoginServiceImpl implements LoginService {
 		try {
 			String userId = deptrequest.getUserId();
 			String companyCode = deptrequest.getCompanyCode();
-			String divisionCode = deptrequest.getDivisionCode();
+			String divisionCode = deptrequest.getBranchCode();
 			String departmentCode = deptrequest.getDepartmentCode();
 
 			// Update or create LM_MENU_USER_COMP record
@@ -745,18 +745,20 @@ public class LoginServiceImpl implements LoginService {
 				}
 				existingComp.setmuc_comp_code(companyCode);
 				repo.save(existingComp);
-				response.put("status", "SUCCESS");
-				response.put("message", "LM menu company updated successfully");
+				response.put(statusCode, successCode);
+				response.put(messageCode, "LM menu company updated successfully");
 			} else {
 				LM_MENU_USER_COMP newComp = new LM_MENU_USER_COMP();
 				Optional<LM_MENU_USERS> user = userrepo.findById(userId);
 				if (user.get() != null) {
+					System.out.println(user.get().getUserId() + companyCode);
 					newComp.setMuc_user_id(user.get());
 				}
 				newComp.setmuc_comp_code(companyCode);
+				System.out.println(newComp);
 				repo.save(newComp);
-				response.put("status", "SUCCESS");
-				response.put("message", "LM menu company created successfully");
+				response.put(statusCode, successCode);
+				response.put(messageCode, "LM menu company created successfully");
 			}
 
 			// Update or create LM_MENU_USER_COMP_DIVN record
@@ -775,8 +777,8 @@ public class LoginServiceImpl implements LoginService {
 				existingCompDivn.setMucd_dept_code(departmentCode);
 				// Set other fields if needed
 				lmmenuuserCompdivrepo.save(existingCompDivn);
-				response.put("status", "SUCCESS");
-				response.put("message", "LM menu company divn updated successfully");
+				response.put(statusCode, successCode);
+				response.put(messageCode, "LM menu company divn updated successfully");
 			} else {
 				com.wenxt.base.model.LM_MENU_USER_COMP_DIVN newCompDivn = new com.wenxt.base.model.LM_MENU_USER_COMP_DIVN();
 				Optional<LM_MENU_USERS> user = userrepo.findById(userId);
@@ -784,17 +786,17 @@ public class LoginServiceImpl implements LoginService {
 					newCompDivn.setMucd_user_id(user.get());
 				}
 				newCompDivn.setMucd_comp_code(companyCode);
-
+				System.out.println(divisionCode + "*");
 				newCompDivn.setMucd_divn_code(divisionCode);
 				newCompDivn.setMucd_dept_code(departmentCode);
 				// Set other fields if needed
 				lmmenuuserCompdivrepo.save(newCompDivn);
-				response.put("status", "SUCCESS");
-				response.put("message", "LM menu company divn created successfully");
+				response.put(statusCode, successCode);
+				response.put(messageCode, "LM menu company divn created successfully");
 			}
 		} catch (Exception e) {
-			response.put("status", "ERROR");
-			response.put("message", "Error occurred: " + e.getMessage());
+			response.put(statusCode, errorCode);
+			response.put(messageCode, "Error occurred: " + e.getMessage());
 		}
 
 		return response.toString();
@@ -808,7 +810,7 @@ public class LoginServiceImpl implements LoginService {
 		try {
 			String userId = user.getUserId();
 			String companyCode = user.getCompanyCode();
-			String divisionCode = user.getDivisionCode();
+			String divisionCode = user.getBranchCode();
 			String departmentCode = user.getDepartmentCode();
 
 			// Check if records exist before deletion
@@ -820,8 +822,8 @@ public class LoginServiceImpl implements LoginService {
 					companyCode);
 
 			if (existingComp == null || existingCompDivn == null) {
-				response.put("status", "ERROR");
-				response.put("message", "Records not found for deletion");
+				response.put(statusCode, errorCode);
+				response.put(messageCode, "Records not found for deletion");
 				return response.toString();
 			}
 
@@ -832,11 +834,11 @@ public class LoginServiceImpl implements LoginService {
 			lmmenuuserCompdivrepo.deleteByUserIdAndCompCodeAndDivnCodeAndDeptCode(userId, companyCode, divisionCode,
 					departmentCode);
 
-			response.put("status", "SUCCESS");
-			response.put("message", "LM menu company and division deleted successfully");
+			response.put(statusCode, successCode);
+			response.put(messageCode, "LM menu company and division deleted successfully");
 		} catch (Exception e) {
-			response.put("status", "ERROR");
-			response.put("message", "Error occurred: " + e.getMessage());
+			response.put(statusCode, errorCode);
+			response.put(messageCode, "Error occurred: " + e.getMessage());
 			e.printStackTrace(); // Log the exception for debugging
 		}
 

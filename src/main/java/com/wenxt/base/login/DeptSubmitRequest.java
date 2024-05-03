@@ -5,7 +5,7 @@ public class DeptSubmitRequest {
 	
 	private String userId;
 	private String companyCode;
-	private String divisionCode;
+	private String branchCode;
 	private String departmentCode;
 	
 	private Integer compId;
@@ -36,12 +36,13 @@ public class DeptSubmitRequest {
 		this.companyCode = companyCode;
 	}
 
-	public String getDivisionCode() {
-		return divisionCode;
+
+	public String getBranchCode() {
+		return branchCode;
 	}
 
-	public void setDivisionCode(String divisionCode) {
-		this.divisionCode = divisionCode;
+	public void setBranchCode(String branchCode) {
+		this.branchCode = branchCode;
 	}
 
 	public String getDepartmentCode() {
