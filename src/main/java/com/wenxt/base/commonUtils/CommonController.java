@@ -73,7 +73,6 @@ public class CommonController {
 		try {
 			return service.getFieldList(request);
 		} catch (IllegalArgumentException | IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			return e.getMessage();
 		}
 	}
@@ -100,7 +99,7 @@ public class CommonController {
 	
 	@PostMapping("/editFields")
 	public String editFields(HttpServletRequest request) {
-		return service.editFields(request, new JSONObject());
+		return service.newEditTabs(request, new JSONObject());
 	}
 	
 	@GetMapping("/lovtoJson")

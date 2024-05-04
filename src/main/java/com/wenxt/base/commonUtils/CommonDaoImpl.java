@@ -132,12 +132,12 @@ public class CommonDaoImpl implements CommonDao {
 		return result;
 	}
 
-	@Override
-	public List<LM_STATIC_DETAILS_FLD_DEFN> getStaticDetailsList(String screenCode, String screenName) {
-		String sql = "SELECT * FROM LM_STATIC_DETAILS_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ?";
-		List<LM_STATIC_DETAILS_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName}, new BeanPropertyRowMapper<>(LM_STATIC_DETAILS_FLD_DEFN.class));
-		return result;
-	}
+//	@Override
+//	public List<LM_STATIC_DETAILS_FLD_DEFN> getStaticDetailsList(String screenCode, String screenName) {
+//		String sql = "SELECT * FROM LM_STATIC_DETAILS_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ?";
+//		List<LM_STATIC_DETAILS_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName}, new BeanPropertyRowMapper<>(LM_STATIC_DETAILS_FLD_DEFN.class));
+//		return result;
+//	}
 
 	@Override
 	public List<LM_ACCORDION_FLD_DEFN> getAccordionResult(String screenCode, String screenName) {

@@ -45,4 +45,6 @@ public interface CommonService {
 
 	public String customerMasterEdit(HttpServletRequest request) throws IllegalArgumentException, IllegalAccessException;
 
+	String newEditTabs(HttpServletRequest request, JSONObject object);
+
 }

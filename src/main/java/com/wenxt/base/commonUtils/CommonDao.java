@@ -35,7 +35,7 @@ public interface CommonDao {
 
 	List<LM_HEADER_INFO_FLD_DEFN> getHeaderInfoList(String string, String string2);
 
-	List<LM_STATIC_DETAILS_FLD_DEFN> getStaticDetailsList(String string, String string2);
+//	List<LM_STATIC_DETAILS_FLD_DEFN> getStaticDetailsList(String string, String string2);
 
 	List<LM_ACCORDION_FLD_DEFN> getAccordionResult(String string, String string2);
 
