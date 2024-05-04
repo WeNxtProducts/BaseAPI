@@ -653,41 +653,47 @@ public class LoginServiceImpl implements LoginService {
 			}
 
 			// Fetching branch list
-//	        url = baseURL + "20" + "MUCD_COMP_CODE=" + user.getCompanyCode();
-
-			url = baseURL + "20" + "&dept_comp_code=" + user.getCompanyCode();
-
-			responseEntity = restTemplate.getForEntity(url, String.class);
-			if (responseEntity.getStatusCode() == HttpStatus.OK) {
-				String serviceResponse = responseEntity.getBody();
-				JSONArray jsonArray = null;
-				try {
-					jsonArray = new JSONObject(serviceResponse).getJSONArray("Data");
-				} catch (JSONException e) {
-					throw new UsernameNotFoundException("Data not found in the response");
+			if (user.getCompanyCode() != null) {
+				System.out.println();
+				url = baseURL + "20&divn_comp_code=" + user.getCompanyCode();
+				System.out.println(url);
+				responseEntity = restTemplate.getForEntity(url, String.class);
+				if (responseEntity.getStatusCode() == HttpStatus.OK) {
+					String serviceResponse = responseEntity.getBody();
+					JSONArray jsonArray = null;
+					try {
+						jsonArray = new JSONObject(serviceResponse).getJSONArray("Data");
+					} catch (JSONException e) {
+						throw new UsernameNotFoundException("Data not found in the response");
+					}
+					List<LOVDTO> branchList = parseLOVDTOList(jsonArray);
+					user.setBranchListCodes(branchList);
+				} else {
+					throw new UsernameNotFoundException("Error fetching branch list");
 				}
-				List<LOVDTO> branchList = parseLOVDTOList(jsonArray);
-				user.setBranchListCodes(branchList);
 			} else {
-				throw new UsernameNotFoundException("Error fetching branch list");
+				throw new UsernameNotFoundException("Company code is required");
 			}
 
 			// Fetching department list
-			url = baseURL + "28" + "&dept_comp_code=" + user.getBranchCode();
-
-			responseEntity = restTemplate.getForEntity(url, String.class);
-			if (responseEntity.getStatusCode() == HttpStatus.OK) {
-				String serviceResponse = responseEntity.getBody();
-				JSONArray jsonArray = null;
-				try {
-					jsonArray = new JSONObject(serviceResponse).getJSONArray("Data");
-				} catch (JSONException e) {
-					throw new UsernameNotFoundException("Data not found in the response");
+			if (user.getBranchCode() != null) {
+				url = baseURL + "28" + "&dept_divn_code=" + user.getBranchCode();
+				responseEntity = restTemplate.getForEntity(url, String.class);
+				if (responseEntity.getStatusCode() == HttpStatus.OK) {
+					String serviceResponse = responseEntity.getBody();
+					JSONArray jsonArray = null;
+					try {
+						jsonArray = new JSONObject(serviceResponse).getJSONArray("Data");
+					} catch (JSONException e) {
+						throw new UsernameNotFoundException("Data not found in the response");
+					}
+					List<LOVDTO> departmentList = parseLOVDTOList(jsonArray);
+					user.setDeptListCodes(departmentList);
+				} else {
+					throw new UsernameNotFoundException("Error fetching department list");
 				}
-				List<LOVDTO> departmentList = parseLOVDTOList(jsonArray);
-				user.setDeptListCodes(departmentList);
 			} else {
-				throw new UsernameNotFoundException("Error fetching department list");
+				throw new UsernameNotFoundException("Branch code is required");
 			}
 
 			// Response construction
