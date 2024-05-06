@@ -31,6 +31,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wenxt.base.userMaster.LM_MENU_USERS;
 
@@ -343,35 +344,42 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
-	public String getListingData(HttpServletRequest request) {
-		JSONObject response = new JSONObject();
-		Map<String, Object> params = processParamLOV(null, request);
-		int queryId = Integer.parseInt(((String) params.get("queryId")));
-		params.remove("queryId");
-		QUERY_MASTER query = commonDao.getQueryLov(queryId);
-		if (query != null) {
-			List<Map<String, Object>> queryResult = commonDao.getListingData(query.getQM_QUERY());
-			Map<String, Object> firstRow = queryResult.get(0);
-			Set<String> columnNames = firstRow.keySet();
-			JSONObject heading = new JSONObject();
-			String headString = (String) firstRow.get("Head");
+	public String getListingData(HttpServletRequest request) { JSONObject response = new JSONObject();
+	Map<String, Object> params = processParamLOV(null, request);
+	int queryId = Integer.parseInt(((String) params.get("queryId")));
+	params.remove("queryId");
+	QUERY_MASTER query = commonDao.getQueryLov(queryId);
+	if (query != null) {
+		List<Map<String, Object>> queryResult = commonDao.getListingData(query.getQM_QUERY());
+		Map<String, Object> firstRow = queryResult.get(0);
+		Set<String> columnNames = firstRow.keySet();
+		LinkedHashMap<String, String> heading = new LinkedHashMap<String, String>();
+		String headString = (String) firstRow.get("Head");
 
-			String[] headingNames = headString.split(",");
+		String[] headingNames = headString.split(",");
 
-			for (String headingName : headingNames) {
-				heading.put(headingName.trim(), headingName.trim());
-			}
-			queryResult.get(0).remove("Head");
-
-			response.put("Heading", heading);
-			response.put(statusCode, successCode);
-			response.put(dataCode, queryResult);
-		} else {
-			response.put(statusCode, errorCode);
-			response.put(messageCode, getLovWrongId);
+		for (String headingName : headingNames) {
+			heading.put(headingName.trim(), headingName.trim());
 		}
-		return response.toString();
+		queryResult.get(0).remove("Head");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = "";
+        try {
+            jsonString = objectMapper.writeValueAsString(heading);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        System.out.println(jsonString);
+        JSONObject headingJson = new JSONObject(jsonString);
+		response.put("Heading", jsonString);
+		response.put(statusCode, successCode);
+		response.put(dataCode, queryResult);
+	} else {
+		response.put(statusCode, errorCode);
+		response.put(messageCode, getLovWrongId);
 	}
+	return response.toString();
+}
 
 	@Override
 	public String getFieldList(HttpServletRequest request) throws IllegalArgumentException, IllegalAccessException {
