@@ -421,12 +421,8 @@ public class UserMasterServiceImpl implements UserMasterService {
 						if (value.isEmpty() == false && value != null) {
 							Method setter = classs.getMethod(setterMethodName, fieldType);
 
-							if (key.equals("user_passwd")) {
-								String encryptedPassword = encryptor.encrypt(value);
-								convertedValue = encryptedPassword;
-							}
-
 							setter.invoke(existingUser, convertedValue);
+
 						}
 					}
 				}
