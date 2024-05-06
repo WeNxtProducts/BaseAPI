@@ -344,7 +344,8 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
-	public String getListingData(HttpServletRequest request) { JSONObject response = new JSONObject();
+	public String getListingData(HttpServletRequest request) {
+		JSONObject response = new JSONObject();
 	Map<String, Object> params = processParamLOV(null, request);
 	int queryId = Integer.parseInt(((String) params.get("queryId")));
 	params.remove("queryId");
@@ -632,7 +633,7 @@ public class CommonServiceImpl implements CommonService {
 		List<Map<String, Object>> queryResult = commonDao.getMrvListing(query.getQM_QUERY(), parames);
 		Map<String, Object> firstRow = queryResult.get(0);
 		Set<String> columnNames = firstRow.keySet();
-		JSONObject heading = new JSONObject();
+		LinkedHashMap<String, String> heading = new LinkedHashMap<String, String>();
 		String headString = (String) firstRow.get("Head");
 
 		String[] headingNames = headString.split(",");
@@ -641,8 +642,15 @@ public class CommonServiceImpl implements CommonService {
 			heading.put(headingName.trim(), headingName.trim());
 		}
 		queryResult.get(0).remove("Head");
-
-		response.put("Heading", heading);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = "";
+        try {
+            jsonString = objectMapper.writeValueAsString(heading);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        JSONObject headingJson = new JSONObject(jsonString);
+		response.put("Heading", jsonString);
 		response.put(statusCode, successCode);
 		response.put(dataCode, queryResult);
 
