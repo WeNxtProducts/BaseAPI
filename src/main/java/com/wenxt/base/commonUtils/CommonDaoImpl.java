@@ -118,61 +118,10 @@ public class CommonDaoImpl implements CommonDao {
 		return result;
 	}
 
-	@Override
-	public List<LM_FRONT_FORM_FLD_DEFN> getFrontFormList(String screenCode, String screenName) {
-		String sql = "SELECT * FROM LM_FRONT_FORM_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ?";
-		List<LM_FRONT_FORM_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName}, new BeanPropertyRowMapper<>(LM_FRONT_FORM_FLD_DEFN.class));
-		return result;
-	}
-
-	@Override
-	public List<LM_HEADER_INFO_FLD_DEFN> getHeaderInfoList(String screenCode, String screenName) {
-		String sql = "SELECT * FROM LM_HEADER_INFO_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ?";
-		List<LM_HEADER_INFO_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName}, new BeanPropertyRowMapper<>(LM_HEADER_INFO_FLD_DEFN.class));
-		return result;
-	}
-
 //	@Override
 //	public List<LM_STATIC_DETAILS_FLD_DEFN> getStaticDetailsList(String screenCode, String screenName) {
 //		String sql = "SELECT * FROM LM_STATIC_DETAILS_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ?";
-//		List<LM_STATIC_DETAILS_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName}, new BeanPropertyRowMapper<>(LM_STATIC_DETAILS_FLD_DEFN.class));
-//		return result;
-//	}
-
-	@Override
-	public List<LM_ACCORDION_FLD_DEFN> getAccordionResult(String screenCode, String screenName) {
-		String sql = "SELECT * FROM LM_ACCORDION_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ? AND PFD_FORM_ITEM_TYPE1 = 'AccordionHeader'";
-		List<LM_ACCORDION_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName}, new BeanPropertyRowMapper<>(LM_ACCORDION_FLD_DEFN.class));
-		return result;
-	}
-
-	@Override
-	public List<LM_ACCORDION_FLD_DEFN> getAccordionFields(String screenCode, String screenName) {
-		String sql = "SELECT * FROM LM_ACCORDION_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ? AND PFD_FORM_ITEM_TYPE1 not in ('AccordionHeader')";
-		List<LM_ACCORDION_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName}, new BeanPropertyRowMapper<>(LM_ACCORDION_FLD_DEFN.class));
-		return result;
-	}
-
-	@Override
-	public List<LM_ACCOTAB_FLD_DEFN> getAccoTabs(String screenCode, String screenName) {
-		String sql = "SELECT * FROM LM_ACCOTAB_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ? AND PFD_FORM_ITEM_TYPE1 not in ('AccordionHeader', 'AccordionTab')";
-		List<LM_ACCOTAB_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName}, new BeanPropertyRowMapper<>(LM_ACCOTAB_FLD_DEFN.class));
-		return result;
-	}
-
-	@Override
-	public List<LM_ACCORDION_FLD_DEFN> getAccordionFieldsDefn(String screenCode, String screenName) {
-		String sql = "SELECT * FROM LM_ACCORDION_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ? AND PFD_FORM_ITEM_TYPE1 not in ('AccordionHeader', 'AccordionTab')";
-		List<LM_ACCORDION_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName}, new BeanPropertyRowMapper<>(LM_ACCORDION_FLD_DEFN.class));
-		return result;
-	}
-
-	@Override
-	public List<LM_ACCOTAB_FLD_DEFN> getAccordionSubTabs(String screenCode, String screenName) {
-		String sql = "SELECT * FROM LM_ACCOTAB_FLD_DEFN WHERE PFD_PROG_CODE = ? AND PFD_SCREEN_NAME = ? AND PFD_FORM_ITEM_TYPE1 in ('AccordionTab')";
-		List<LM_ACCOTAB_FLD_DEFN> result = template.query(sql, new Object[] {screenCode, screenName}, new BeanPropertyRowMapper<>(LM_ACCOTAB_FLD_DEFN.class));
-		return result;
-	}
+//		}
 
 	@Override
 	public lt_policy getQuotationFields(String string, String string2, Object object) {
