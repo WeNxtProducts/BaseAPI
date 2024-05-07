@@ -68,8 +68,8 @@ public class CommonDaoImpl implements CommonDao {
 	}
 
 	@Override
-	public List<Map<String, Object>> getListingData(String query) {
-		    List<Map<String, Object>> result = template.queryForList(query);
+	public List<Map<String, Object>> getListingData(String query, Integer limit, Integer offset) {
+		    List<Map<String, Object>> result = template.queryForList(query, new Object[] {limit, offset});
 		    return result;
 	}
 	

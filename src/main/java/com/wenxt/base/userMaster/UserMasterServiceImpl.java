@@ -15,6 +15,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.http.HttpHost;
+import org.elasticsearch.action.DocWriteResponse.Result;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.jasypt.encryption.StringEncryptor;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -388,6 +396,22 @@ public class UserMasterServiceImpl implements UserMasterService {
 					response.put(messageCode, "User created successfully");
 					data.put("Id", savedUser.getUserId());
 					response.put(dataCode, data);
+					
+			        RestClientBuilder builder = RestClient.builder(
+			                new HttpHost("localhost", 9200, "http"));
+			        RestHighLevelClient client = new RestHighLevelClient(builder);
+
+			        IndexRequest req = new IndexRequest("users", "IDDD").source(formFields);
+			        
+			        IndexResponse res = client.index(req, RequestOptions.DEFAULT);
+			        
+			        if (res.getResult() == Result.CREATED) {
+			        	  System.out.println("Document indexed successfully!");
+			        	} else {
+			        	  // Handle indexing failure
+			        	}
+
+			        	client.close();
 				} catch (Exception e) {
 					e.printStackTrace();
 					response.put(statusCode, errorCode);

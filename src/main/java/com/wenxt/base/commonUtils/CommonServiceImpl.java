@@ -40,6 +40,22 @@ import eu.bitwalker.useragentutils.UserAgent;
 import jakarta.persistence.Column;
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClientBuilder;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
 @Service
 public class CommonServiceImpl implements CommonService {
 
@@ -349,9 +365,13 @@ public class CommonServiceImpl implements CommonService {
 	Map<String, Object> params = processParamLOV(null, request);
 	int queryId = Integer.parseInt(((String) params.get("queryId")));
 	params.remove("queryId");
+	Integer limit = Integer.parseInt(((String) params.get("limit")));
+	Integer offset = Integer.parseInt(((String) params.get("offset")));
+	params.remove("limit");
+	params.remove("offset");
 	QUERY_MASTER query = commonDao.getQueryLov(queryId);
 	if (query != null) {
-		List<Map<String, Object>> queryResult = commonDao.getListingData(query.getQM_QUERY());
+		List<Map<String, Object>> queryResult = commonDao.getListingData(query.getQM_QUERY(), limit, offset);
 		Map<String, Object> firstRow = queryResult.get(0);
 		Set<String> columnNames = firstRow.keySet();
 		LinkedHashMap<String, String> heading = new LinkedHashMap<String, String>();
@@ -1184,6 +1204,73 @@ public class CommonServiceImpl implements CommonService {
 		list.add(2);
 
 		return response.toString();
+	}
+
+	@Override
+	public String sampleESSearch(HttpServletRequest request) {
+		  RestClientBuilder builder = RestClient.builder(
+	                new HttpHost("localhost", 9200, "http"));
+	        RestHighLevelClient client = new RestHighLevelClient(builder);
+	        
+	        SearchRequest req = new SearchRequest("users");
+	        SearchSourceBuilder builders = new SearchSourceBuilder();
+	        builders.query(QueryBuilders.matchQuery("user_id", "ESTEST"));
+	        req.source(builders);
+	        
+	        try {
+	        	 SearchResponse searchResponse = client.search(req, RequestOptions.DEFAULT);
+	        	 SearchHit[] searchHits = searchResponse.getHits().getHits();
+	        	 
+	        	 for (SearchHit hit : searchHits) {
+	        		 sampleESDB();
+	                 // Access search hit data
+	                 String documentId = hit.getId();
+	                 String sourceAsString = hit.getSourceAsString();
+	                 // Process document data as needed
+	                 System.out.println("Document ID: " + documentId);
+	                 System.out.println("Document Source: " + sourceAsString);
+	             }
+	        }catch(Exception e) {
+	        	e.printStackTrace();
+	        }
+	        
+	        
+		return null;
+	}
+	
+	private static void sampleESDB() {
+		  String jdbcUrl = "jdbc:es://localhost:9200";
+
+	        // SQL query to execute
+	        String sqlQuery = "SELECT * FROM users WHERE user_id = 'ESTEST'";
+
+	        try {
+	            // Load the Elasticsearch JDBC driver
+	            Class.forName("org.elasticsearch.xpack.sql.jdbc.EsDriver");
+
+	            // Establish a connection to Elasticsearch
+	            Connection connection = DriverManager.getConnection(jdbcUrl);
+
+	            // Create a statement for executing SQL queries
+	            Statement statement = connection.createStatement();
+
+	            // Execute the SQL query
+	            ResultSet resultSet = statement.executeQuery(sqlQuery);
+
+	            // Process the results
+	            while (resultSet.next()) {
+	            	System.out.println("****");
+	                System.out.println(resultSet.next());
+	                System.out.println("****");
+	            }
+
+	            // Close the result set, statement, and connection
+	            resultSet.close();
+	            statement.close();
+	            connection.close();
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
 	}
 
 }

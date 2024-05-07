@@ -47,4 +47,6 @@ public interface CommonService {
 
 	String newEditTabs(HttpServletRequest request, JSONObject object);
 
+	public String sampleESSearch(HttpServletRequest request);
+
 }

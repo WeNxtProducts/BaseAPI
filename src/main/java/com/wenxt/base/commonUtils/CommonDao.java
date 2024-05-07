@@ -17,7 +17,7 @@ public interface CommonDao {
 	
 	List<LOVDTO> executeLOVQuery(String query, Map<String, Object> paramList);
 	
-	List<Map<String, Object>> getListingData(String query);
+	List<Map<String, Object>> getListingData(String query, Integer limit, Integer offset);
 	
 	List<LM_PROG_FIELD_DEFN_NEW> getFieldList(String screenCode, String screenName, String query);
 	

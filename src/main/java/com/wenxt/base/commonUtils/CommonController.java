@@ -136,5 +136,10 @@ public class CommonController {
 				return e.getMessage();
 			}
 	}
+	
+	@GetMapping("/sampleESSearch")
+	public String sampleEsSearch(HttpServletRequest request) {
+		return service.sampleESSearch(request);
+	}
 
 }
