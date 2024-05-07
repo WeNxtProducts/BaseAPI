@@ -393,6 +393,7 @@ public class CommonServiceImpl implements CommonService {
         System.out.println(jsonString);
         JSONObject headingJson = new JSONObject(jsonString);
 		response.put("Heading", jsonString);
+		response.put("count", queryResult.get(0).get("count"));
 		response.put(statusCode, successCode);
 		response.put(dataCode, queryResult);
 	} else {
