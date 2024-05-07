@@ -17,7 +17,7 @@ public class LM_CUSTOMER {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "cust_code")
-	private int cust_code;
+	private Integer custCode;
 	
 	@Column(name = "cust_class")
 	private String cust_class;
@@ -190,12 +190,15 @@ public class LM_CUSTOMER {
 	@Column(name = "cust_comp_code")
 	private String cust_comp_code;
 
-	public int getCust_code() {
-		return cust_code;
+	
+	
+
+	public Integer getCustCode() {
+		return custCode;
 	}
 
-	public void setCust_code(int cust_code) {
-		this.cust_code = cust_code;
+	public void setCustCode(Integer custCode) {
+		this.custCode = custCode;
 	}
 
 	public String getCust_class() {
