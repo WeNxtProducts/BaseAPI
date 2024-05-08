@@ -25,8 +25,6 @@ public interface CommonService {
 	
 	public String getMrvListing(HttpServletRequest request);
 	
-	public String getFieldList(HttpServletRequest request) throws IllegalArgumentException, IllegalAccessException;
-	
 	public void asyncMethod(AsyncDTO inputRequest, HttpServletRequest request);
 	
 	public void syncMethod(AsyncDTO inputRequest, HttpServletRequest request);
@@ -35,7 +33,7 @@ public interface CommonService {
 	
 	public String serviceToJson(HttpServletRequest request);
 
-	public String editFields(HttpServletRequest request, JSONObject object);
+//	public String editFields(HttpServletRequest request, JSONObject object);
 
 	public String lovToJson(HttpServletRequest request);
 
@@ -47,6 +45,6 @@ public interface CommonService {
 
 	String newEditTabs(HttpServletRequest request, JSONObject object);
 
-	public String sampleESSearch(HttpServletRequest request);
+	public String eSSearch(HttpServletRequest request);
 
 }

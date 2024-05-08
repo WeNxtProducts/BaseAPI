@@ -1,5 +1,6 @@
 package com.wenxt.base.model.index;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -12,13 +13,13 @@ import jakarta.annotation.Nullable;
 public class UserIndex {
 	
 	@JsonProperty("user_id")
-	private String	userId;
+	private String	userID;
 	
 	@JsonProperty("user_passwd")
 	private String	user_passwd;
 	
 	@JsonProperty("user_desc")
-	private String	user_desc;
+	private String	userName;
 	
 	@JsonProperty("user_group_id")
 	@Nullable
@@ -94,7 +95,7 @@ public class UserIndex {
 	
 	@JsonProperty("user_ins_Dt")
 	@Nullable
-	private LocalDateTime	user_ins_Dt;
+	private LocalDate user_ins_Dt;
 	
 	@JsonProperty("user_ins_id")
 	@Nullable
@@ -102,7 +103,7 @@ public class UserIndex {
 	
 	@JsonProperty("user_mod_Dt")
 	@Nullable
-	private LocalDateTime user_mod_Dt;
+	private LocalDate user_mod_Dt;
 	
 	@JsonProperty("user_mod_id")
 	@Nullable
@@ -148,7 +149,7 @@ public class UserIndex {
 	private String	user_passwd_expiry_yn;
 	
 	@JsonProperty("user_expiry_dt")
-	private LocalDateTime user_expiry_dt;
+	private LocalDate user_expiry_dt;
 	
 	@JsonProperty("user_first_login_yn")
 	private Boolean userFirstLoginyn;
@@ -163,7 +164,7 @@ public class UserIndex {
 	
 	@JsonProperty("user_designation")
 	@Nullable
-	private String	user_designation;
+	private String	role;
 	
 	@JsonProperty("user_desig_desc")
 	@Nullable
@@ -223,7 +224,7 @@ public class UserIndex {
 	
 	@JsonProperty("user_client_id")
 	@Nullable
-	private String	user_client_id;
+	private String	client;
 	
 	@JsonProperty("user_client_code")
 	@Nullable
@@ -282,11 +283,11 @@ public class UserIndex {
 	public void setUserResettoken(String userResettoken) {
 		this.userResettoken = userResettoken;
 	}
-	public String getUserId() {
-		return userId;
+	public String getUserID() {
+		return userID;
 	}
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setUserID(String userID) {
+		this.userID = userID;
 	}
 	public String getUser_passwd() {
 		return user_passwd;
@@ -300,11 +301,11 @@ public class UserIndex {
 	public void setUser_group_id(String user_group_id) {
 		this.user_group_id = user_group_id;
 	}
-	public String getUser_desc() {
-		return user_desc;
+	public String getUserName() {
+		return userName;
 	}
-	public void setUser_desc(String user_desc) {
-		this.user_desc = user_desc;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 	public String getUser_bl_desc() {
 		return user_bl_desc;
@@ -399,10 +400,10 @@ public class UserIndex {
 	public void setUser_override_yn(String user_override_yn) {
 		this.user_override_yn = user_override_yn;
 	}
-	public LocalDateTime getUser_ins_Dt() {
+	public LocalDate getUser_ins_Dt() {
 		return user_ins_Dt;
 	}
-	public void setUser_ins_Dt(LocalDateTime user_ins_Dt) {
+	public void setUser_ins_Dt(LocalDate user_ins_Dt) {
 		this.user_ins_Dt = user_ins_Dt;
 	}
 	public String getUser_ins_id() {
@@ -411,10 +412,10 @@ public class UserIndex {
 	public void setUser_ins_id(String user_ins_id) {
 		this.user_ins_id = user_ins_id;
 	}
-	public LocalDateTime getUser_mod_Dt() {
+	public LocalDate getUser_mod_Dt() {
 		return user_mod_Dt;
 	}
-	public void setUser_mod_Dt(LocalDateTime user_mod_Dt) {
+	public void setUser_mod_Dt(LocalDate user_mod_Dt) {
 		this.user_mod_Dt = user_mod_Dt;
 	}
 	public String getUser_mod_id() {
@@ -489,10 +490,10 @@ public class UserIndex {
 	
 	
 	
-	public LocalDateTime getUser_expiry_dt() {
+	public LocalDate getUser_expiry_dt() {
 		return user_expiry_dt;
 	}
-	public void setUser_expiry_dt(LocalDateTime user_expiry_dt) {
+	public void setUser_expiry_dt(LocalDate user_expiry_dt) {
 		this.user_expiry_dt = user_expiry_dt;
 	}
 	public void setUser_login_count(Short user_login_count) {
@@ -519,11 +520,11 @@ public class UserIndex {
 	public void setUser_initial(String user_initial) {
 		this.user_initial = user_initial;
 	}
-	public String getUser_designation() {
-		return user_designation;
+	public String getRole() {
+		return role;
 	}
-	public void setUser_designation(String user_designation) {
-		this.user_designation = user_designation;
+	public void setRole(String role) {
+		this.role = role;
 	}
 	public String getUser_desig_desc() {
 		return user_desig_desc;
@@ -609,11 +610,11 @@ public class UserIndex {
 	public void setUser_port_code(String user_port_code) {
 		this.user_port_code = user_port_code;
 	}
-	public String getUser_client_id() {
-		return user_client_id;
+	public String getClient() {
+		return client;
 	}
-	public void setUser_client_id(String user_client_id) {
-		this.user_client_id = user_client_id;
+	public void setClient(String client) {
+		this.client = client;
 	}
 	public String getUser_client_code() {
 		return user_client_code;

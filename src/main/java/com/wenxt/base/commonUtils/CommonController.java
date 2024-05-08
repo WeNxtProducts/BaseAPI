@@ -68,14 +68,14 @@ public class CommonController {
 		return service.getMrvListing(request);
 	}
 	
-	@GetMapping("/getfield")
-	public String getFieldList(HttpServletRequest request) {
-		try {
-			return service.getFieldList(request);
-		} catch (IllegalArgumentException | IllegalAccessException e) {
-			return e.getMessage();
-		}
-	}
+//	@GetMapping("/getfield")
+//	public String getFieldList(HttpServletRequest request) {
+//		try {
+//			return service.getFieldList(request);
+//		} catch (IllegalArgumentException | IllegalAccessException e) {
+//			return e.getMessage();
+//		}
+//	}
 	
 	@PostMapping("/runasyncservice")
 	public void runAsyncService(@RequestBody AsyncDTO object, HttpServletRequest request) {
@@ -137,9 +137,9 @@ public class CommonController {
 			}
 	}
 	
-	@GetMapping("/sampleESSearch")
+	@GetMapping("/userListSearch")
 	public String sampleEsSearch(HttpServletRequest request) {
-		return service.sampleESSearch(request);
+		return service.eSSearch(request);
 	}
 
 }

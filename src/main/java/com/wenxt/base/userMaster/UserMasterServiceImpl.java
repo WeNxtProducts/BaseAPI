@@ -398,10 +398,10 @@ public class UserMasterServiceImpl implements UserMasterService {
 					response.put(dataCode, data);
 					
 			        RestClientBuilder builder = RestClient.builder(
-			                new HttpHost("localhost", 9200, "http"));
+			                new HttpHost("192.168.1.7", 9200, "http"));
 			        RestHighLevelClient client = new RestHighLevelClient(builder);
 
-			        IndexRequest req = new IndexRequest("users", "IDDD").source(formFields);
+			        IndexRequest req = new IndexRequest("users").id(savedUser.getUserId()).source(formFields);
 			        
 			        IndexResponse res = client.index(req, RequestOptions.DEFAULT);
 			        
