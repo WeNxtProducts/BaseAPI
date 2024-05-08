@@ -114,13 +114,13 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
 		Date currentDate = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String formattedDate = formatter.format(currentDate);
-
+		LocalDateTime currentDate1 = LocalDateTime.now();
 		if (optionalUser.isPresent()) {
 			LM_CUSTOMER existingUser = optionalUser.get();
 
-			existingUser.setCust_eff_fm_dt(formattedDate);
-			existingUser.setCust_eff_to_dt(formattedDate);
-			existingUser.setCust_frz_flag("Y");
+			existingUser.setCust_frz_flag("N");
+			existingUser.setCust_eff_fm_dt(currentDate1);
+			existingUser.setCust_eff_to_dt(currentDate1);
 
 			cmrepo.save(existingUser);
 
@@ -155,7 +155,7 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
 		JSONObject data = new JSONObject();
 
 		try {
-			Integer custCode = Integer.parseInt(requestData.getFrontForm().getFormFields().get("custCode"));
+			Integer custCode = Integer.parseInt(requestData.getFrontForm().getFormFields().get("CUST_CODE"));
 			Optional<LM_CUSTOMER> optionalUser = cmrepo.findByCustCode(custCode);
 			LM_CUSTOMER user = optionalUser.orElse(new LM_CUSTOMER());
 
@@ -164,7 +164,7 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
 			fieldMaps.put("physicalAddress", requestData.getPhysical_address().getFormFields());
 			fieldMaps.put("personalDetails", requestData.getPersonal_details().getFormFields());
 			fieldMaps.put("postalAddress", requestData.getPostal_address().getFormFields());
-			fieldMaps.put("bankDetails", requestData.getBank_details().getFormFields());
+//			fieldMaps.put("bankDetails", requestData.getBank_details().getFormFields());
 			
 //			fieldMaps.put("address", requestData.getAddress().getFormFields());
 //			fieldMaps.put("relationHistory", requestData.getRelation_History().getFormFields());
@@ -184,6 +184,12 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
 
 			// Save or update user to database
 			try {
+				user.setCust_frz_flag("N");
+				user.setCust_ml_name("d");
+				user.setCust_ml_short_name("d");
+				user.setCust_national_id("f");
+				user.setCust_name("ll");
+				user.setCust_short_name("WE");
 				LM_CUSTOMER savedUser = cmrepo.save(user);
 				response.put(statusCode, 200);
 				response.put(messageCode,
