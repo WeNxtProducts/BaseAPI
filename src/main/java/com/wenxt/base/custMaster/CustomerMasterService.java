@@ -4,10 +4,7 @@ import java.sql.SQLException;
 
 import org.json.JSONException;
 
-import com.wenxt.base.commonUtils.LM_CUSTOMER;
-import com.wenxt.base.userMaster.RequestDataDto;
-
-import jakarta.servlet.http.HttpServletRequest;
+import com.wenxt.base.dto.CustomerRequestDto;
 
 public interface CustomerMasterService {
 
@@ -19,7 +16,7 @@ public interface CustomerMasterService {
 
 //	String createCustomer(RequestDataDto requestData);
 
-	String createCustomer(CustRequestData requestData);
+	String createCustomer(CustomerRequestDto requestData);
 
 
 }

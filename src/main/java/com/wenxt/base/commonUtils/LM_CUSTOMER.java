@@ -18,180 +18,177 @@ public class LM_CUSTOMER {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "cust_code")
 	private Integer custCode;
-	
+
 	@Column(name = "cust_class")
 	private String cust_class;
-	
+
 	@Column(name = "cust_type")
 	private String cust_type;
-	
+
 	@Column(name = "cust_name")
 	private String cust_name;
-	
+
 	@Column(name = "cust_short_name")
 	private String cust_short_name;
-	
+
 	@Column(name = "cust_dob")
 	private String cust_dob;
-	
+
 	@Column(name = "cust_catg_code")
 	private String cust_catg_code;
-	
+
 	@Column(name = "cust_addr1")
 	private String cust_addr1;
-	
+
 	@Column(name = "cust_addr2")
 	private String cust_addr2;
-	
+
 	@Column(name = "cust_addr3")
 	private String cust_addr3;
-	
+
 	@Column(name = "cust_contact")
 	private String cust_contact;
-	
+
 	@Column(name = "cust_phone")
 	private String cust_phone;
-	
+
 	@Column(name = "cust_city")
 	private String cust_city;
-	
+
 	@Column(name = "cust_country")
 	private String cust_country;
-	
+
 	@Column(name = "cust_mar_status")
 	private String cust_mar_status;
-	
+
 	@Column(name = "cust_salutation")
 	private String cust_salutation;
-	
+
 	@Column(name = "cust_ml_name")
 	private String cust_ml_name;
-	
+
 	@Column(name = "cust_ml_short_name")
 	private String cust_ml_short_name;
-	
+
 	@Column(name = "cust_ml_addr1")
 	private String cust_ml_addr1;
-	
+
 	@Column(name = "cust_ml_addr2")
 	private String cust_ml_addr2;
-	
+
 	@Column(name = "cust_ml_addr3")
 	private String cust_ml_addr3;
-	
+
 	@Column(name = "cust_ml_contact")
 	private String cust_ml_contact;
-	
+
 	@Column(name = "cust_ml_phone")
 	private String cust_ml_phone;
-	
+
 	@Column(name = "cust_ml_city")
 	private String cust_ml_city;
-	
+
 	@Column(name = "cust_ml_country")
 	private String cust_ml_country;
-	
+
 	@Column(name = "cust_frz_flag")
 	private String cust_frz_flag;
-	
+
 	@Column(name = "cust_ins_dt")
 	private LocalDateTime cust_ins_dt;
-	
+
 	@Column(name = "cust_ins_id")
 	private String cust_ins_id;
-	
+
 	@Column(name = "cust_mod_dt")
 	private LocalDateTime cust_mod_dt;
-	
+
 	@Column(name = "cust_mod_id")
 	private String cust_mod_id;
-	
+
 	@Column(name = "cust_national_id")
 	private String cust_national_id;
-	
+
 	@Column(name = "cust_credit_days")
 	private String cust_credit_days;
-	
+
 	@Column(name = "cust_occupation")
 	private String cust_occupation;
-	
+
 	@Column(name = "cust_mobile_no")
 	private String cust_mobile_no;
-	
+
 	@Column(name = "cust_qualfn")
 	private String cust_qualfn;
-	
+
 	@Column(name = "cust_eff_fm_dt")
-	private LocalDateTime cust_eff_fm_dt;
-	
+	private String cust_eff_fm_dt;
+
 	@Column(name = "cust_eff_to_dt")
 	private String cust_eff_to_dt;
-	
+
 	@Column(name = "cust_agency_name")
 	private String cust_agency_name;
-	
+
 	@Column(name = "cust_agent_rank_code")
 	private String cust_agent_rank_code;
-	
+
 	@Column(name = "cust_lcn_no")
 	private String cust_lcn_no;
-	
+
 	@Column(name = "cust_lic_start_dt")
 	private LocalDateTime cust_lic_start_dt;
-	
+
 	@Column(name = "cust_lic_end_dt")
 	private LocalDateTime cust_lic_end_dt;
-	
+
 	@Column(name = "cust_lcn_reg_dt")
 	private LocalDateTime cust_lcn_reg_dt;
-	
+
 	@Column(name = "cust_lcn_status")
 	private String cust_lcn_status;
-	
+
 	@Column(name = "cust_spouse_name")
 	private String cust_spouse_name;
-	
+
 	@Column(name = "cust_status")
 	private String cust_status;
-	
+
 	@Column(name = "cust_flex_01")
 	private String cust_flex_01;
-	
+
 	@Column(name = "cust_flex_02")
 	private String cust_flex_02;
-	
+
 	@Column(name = "cust_flex_03")
 	private String cust_flex_03;
-	
+
 	@Column(name = "cust_flex_04")
 	private String cust_flex_04;
-	
+
 	@Column(name = "cust_flex_05")
 	private String cust_flex_05;
-	
+
 	@Column(name = "cust_flex_06")
 	private String cust_flex_06;
-	
+
 	@Column(name = "cust_flex_07")
 	private String cust_flex_07;
-	
+
 	@Column(name = "cust_flex_08")
 	private String cust_flex_08;
-	
+
 	@Column(name = "cust_flex_09")
 	private String cust_flex_09;
-	
+
 	@Column(name = "cust_flex_10")
 	private String cust_flex_10;
-	
+
 	@Column(name = "cust_employer_code")
 	private String cust_employer_code;
-	
+
 	@Column(name = "cust_comp_code")
 	private String cust_comp_code;
-
-	
-	
 
 	public Integer getCustCode() {
 		return custCode;
@@ -473,11 +470,11 @@ public class LM_CUSTOMER {
 		this.cust_qualfn = cust_qualfn;
 	}
 
-	public LocalDateTime getCust_eff_fm_dt() {
+	public String getCust_eff_fm_dt() {
 		return cust_eff_fm_dt;
 	}
 
-	public void setCust_eff_fm_dt(LocalDateTime cust_eff_fm_dt) {
+	public void setCust_eff_fm_dt(String cust_eff_fm_dt) {
 		this.cust_eff_fm_dt = cust_eff_fm_dt;
 	}
 
@@ -658,4 +655,3 @@ public class LM_CUSTOMER {
 	}
 
 }
-
