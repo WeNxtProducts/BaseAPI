@@ -191,18 +191,18 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
 				user.setCust_name("ll");
 				user.setCust_short_name("WE");
 				LM_CUSTOMER savedUser = cmrepo.save(user);
-				response.put(statusCode, 200);
+				response.put(statusCode, successCode);
 				response.put(messageCode,
 						optionalUser.isPresent() ? "User updated successfully" : "User created successfully");
 				data.put("Id", savedUser.getCustCode());
 				response.put("data", data);
 			} catch (Exception e) {
-				response.put("statusCode", 500);
+				response.put("statusCode", errorCode);
 				response.put("message", "An error occurred: " + e.getMessage());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.put("statusCode", 500);
+			response.put("statusCode", errorCode);
 			response.put("message", "An error occurred: " + e.getMessage());
 		}
 
