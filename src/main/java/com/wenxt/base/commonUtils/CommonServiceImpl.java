@@ -828,7 +828,9 @@ public class CommonServiceImpl implements CommonService {
 
 	        SearchRequest req = new SearchRequest("users");
 	        SearchSourceBuilder builders = new SearchSourceBuilder();
-	        builders.query(QueryBuilders.multiMatchQuery(params.get("searchText")).field("*"));
+	        builders.query(QueryBuilders.boolQuery()
+	        	    .should(QueryBuilders.multiMatchQuery(params.get("searchText")).field("*"))
+	        	    .should(QueryBuilders.queryStringQuery("*" + params.get("searchText") + "*")));
 	        builders.size(Integer.parseInt(params.get("limit").toString()));
 	        builders.from(Integer.parseInt(params.get("offset").toString()));
 	        req.source(builders);
