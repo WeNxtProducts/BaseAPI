@@ -392,7 +392,6 @@ public class CommonServiceImpl implements CommonService {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        System.out.println(jsonString);
         JSONObject headingJson = new JSONObject(jsonString);
 		response.put("Heading", jsonString);
 		response.put("count", queryResult.get(0).get("count"));
@@ -577,10 +576,8 @@ public class CommonServiceImpl implements CommonService {
 		String file_path = basePath + params.get("screenName") + "_getLOVList.json";
 		QUERY_MASTER query = commonDao.getQueryLov(18);
 		if (query != null) {
-			System.out.println(query.getQM_QUERY());
 			List<LovToJsonDTO> result = commonDao.lovToJson(query.getQM_QUERY(), params.get("screenCode").toString(),
 					params.get("screenName").toString());
-			System.out.println(result.size());
 			for (LovToJsonDTO item : result) {
 				resultMap.put(item.getColumnName(), commonDao.executeLOVQuery(item.getQuery(), null));
 			}
@@ -825,13 +822,15 @@ public class CommonServiceImpl implements CommonService {
 		JSONObject response = new JSONObject();
 		Map<String, Object> params = processParamLOV(null, request);
 		  RestClientBuilder builder = RestClient.builder(
-	                new HttpHost("192.168.1.7", 9200, "http"));
+	                new HttpHost("192.168.1.150", 9200, "http"));
 	        RestHighLevelClient client = new RestHighLevelClient(builder);
    		 ObjectMapper mapper = new ObjectMapper();
 
 	        SearchRequest req = new SearchRequest("users");
 	        SearchSourceBuilder builders = new SearchSourceBuilder();
 	        builders.query(QueryBuilders.multiMatchQuery(params.get("searchText")).field("*"));
+	        builders.size(Integer.parseInt(params.get("limit").toString()));
+	        builders.from(Integer.parseInt(params.get("offset").toString()));
 	        req.source(builders);
 	    	QUERY_MASTER query = commonDao.getQueryLov(4);
 			List<Map<String, Object>> queryResult = commonDao.getListingData(query.getQM_QUERY(), Integer.parseInt(params.get("limit").toString()), Integer.parseInt(params.get("offset").toString()));
@@ -881,40 +880,6 @@ public class CommonServiceImpl implements CommonService {
 	        	e.printStackTrace();
 	        }    
 		return response.toString();
-	}
-	
-	private static void sampleESDB() {
-		  String jdbcUrl = "jdbc:es://localhost:9200";
-
-	        // SQL query to execute
-	        String sqlQuery = "SELECT * FROM users WHERE user_id = 'ESTEST'";
-
-	        try {
-	            // Load the Elasticsearch JDBC driver
-	            Class.forName("org.elasticsearch.xpack.sql.jdbc.EsDriver");
-
-	            // Establish a connection to Elasticsearch
-	            Connection connection = DriverManager.getConnection(jdbcUrl);
-
-	            // Create a statement for executing SQL queries
-	            Statement statement = connection.createStatement();
-
-	            // Execute the SQL query
-	            ResultSet resultSet = statement.executeQuery(sqlQuery);
-
-	            // Process the results
-	            while (resultSet.next()) {
-	            	System.out.println("****");
-	                System.out.println(resultSet.next());
-	                System.out.println("****");
-	            }
-
-	            resultSet.close();
-	            statement.close();
-	            connection.close();
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
 	}
 
 }

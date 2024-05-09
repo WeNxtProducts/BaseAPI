@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +20,8 @@ import org.apache.http.HttpHost;
 import org.elasticsearch.action.DocWriteResponse.Result;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
@@ -398,7 +401,7 @@ public class UserMasterServiceImpl implements UserMasterService {
 					response.put(dataCode, data);
 					
 			        RestClientBuilder builder = RestClient.builder(
-			                new HttpHost("192.168.1.7", 9200, "http"));
+			                new HttpHost("192.168.1.150", 9200, "http"));
 			        RestHighLevelClient client = new RestHighLevelClient(builder);
 
 			        IndexRequest req = new IndexRequest("users").id(savedUser.getUserId()).source(formFields);
@@ -420,6 +423,7 @@ public class UserMasterServiceImpl implements UserMasterService {
 			} else {
 
 				LM_MENU_USERS existingUser = optionalUser.get();
+				Map<String, Object> updateMap = new HashMap<String, Object>();
 
 				for (Map.Entry<String, String> entry : formFields.entrySet()) {
 					String key = entry.getKey();
@@ -444,7 +448,7 @@ public class UserMasterServiceImpl implements UserMasterService {
 
 						if (value.isEmpty() == false && value != null) {
 							Method setter = classs.getMethod(setterMethodName, fieldType);
-
+							updateMap.put(field.getName(), value);
 							setter.invoke(existingUser, convertedValue);
 
 						}
@@ -456,8 +460,26 @@ public class UserMasterServiceImpl implements UserMasterService {
 					response.put(messageCode, "User information updated successfully");
 					data.put("Id", existingUser.getUserId());
 					response.put(dataCode, data);
-				} catch (Exception e) {
+					
+					String indexName = "users";
+					String documentId = existingUser.getUserId().toString();
+					
+			        RestClientBuilder builder = RestClient.builder(
+			                new HttpHost("192.168.1.150", 9200, "http"));
+			        RestHighLevelClient client = new RestHighLevelClient(builder);
 
+					UpdateRequest updateRequest = new UpdateRequest(indexName, documentId);
+					updateRequest.doc(updateMap);
+					
+					 UpdateResponse updateResponse = client.update(updateRequest, RequestOptions.DEFAULT);
+
+					    if (updateResponse.getResult() == Result.UPDATED) {
+					        System.out.println("Document updated successfully");
+					    } else if (updateResponse.getResult() == Result.NOOP) {
+					        System.out.println("No changes made to the document");
+					    }
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		} catch (Exception e) {
