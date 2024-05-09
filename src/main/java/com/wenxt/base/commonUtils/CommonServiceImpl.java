@@ -873,6 +873,7 @@ public class CommonServiceImpl implements CommonService {
 	        		 }
 	        		 finalResult.add(finalMap);
 	             }
+	        	 response.put("Count", searchHits.length);
 	        	 response.put("Heading", jsonString);
 	        	 response.put(statusCode, successCode);
 	        	 response.put(dataCode, finalResult);
