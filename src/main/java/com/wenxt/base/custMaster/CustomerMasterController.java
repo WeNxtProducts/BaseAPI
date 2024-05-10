@@ -30,15 +30,15 @@ public class CustomerMasterController {
 		return custom.getAllCustomlist();
 	}
 
-	@GetMapping("getcustomer/{custcode}")
-	public String getCustomerUserById(@PathVariable int custcode) {
-		return custom.getCustomerUserById(custcode);
+	@GetMapping("getcustomer/{custCode}")
+	public String getCustomerUserById(@PathVariable String custCode) {
+		return custom.getCustomerUserById(custCode);
 
 	}
 
-	@DeleteMapping("/deletes/{custcode}")
-	public String deleteUser(@PathVariable int custcode) {
-		return custom.deleteUserById(custcode);
+	@DeleteMapping("/deletes/{custCode}")
+	public String deleteUser(@PathVariable String custCode) {
+		return custom.deleteUserById(custCode);
 	}
 	
 	

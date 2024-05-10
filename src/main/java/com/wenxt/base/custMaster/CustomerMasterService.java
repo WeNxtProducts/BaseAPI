@@ -10,13 +10,10 @@ public interface CustomerMasterService {
 
 	String getAllCustomlist() throws JSONException, SQLException;
 
-	String getCustomerUserById(int custcode);
+	String getCustomerUserById(String custcode);
 
-	String deleteUserById(int custcode);
-
-//	String createCustomer(RequestDataDto requestData);
+	String deleteUserById(String custcode);
 
 	String createCustomer(CustomerRequestDto requestData);
-
 
 }

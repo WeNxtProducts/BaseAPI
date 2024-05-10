@@ -106,7 +106,7 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
 		return statement.executeQuery(query);
 	}
 
-	public String deleteUserById(int custcode) {
+	public String deleteUserById(String custcode) {
 
 		JSONObject response = new JSONObject();
 		JSONObject data = new JSONObject();
@@ -138,7 +138,7 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
 
 	}
 
-	public String getCustomerUserById(int custcode) {
+	public String getCustomerUserById(String custcode) {
 		LM_CUSTOMER lmCustClass = cmrepo.findById(custcode)
 				.orElseThrow(() -> new RuntimeException("LM CLASS not found"));
 
@@ -155,40 +155,27 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
 		JSONObject data = new JSONObject();
 
 		try {
-			Integer custCode = Integer.parseInt(requestData.getFrontForm().getFormFields().get("CUST_CODE"));
+			String custCode = requestData.getFrontForm().getFormFields().get("CUST_CODE");
 			Optional<LM_CUSTOMER> optionalUser = cmrepo.findByCustCode(custCode);
 			LM_CUSTOMER user = optionalUser.orElse(new LM_CUSTOMER());
 
 			Map<String, Map<String, String>> fieldMaps = new HashMap<>();
 			fieldMaps.put("frontForm", requestData.getFrontForm().getFormFields());
-			fieldMaps.put("physicalAddress", requestData.getPhysical_address().getFormFields());
-			fieldMaps.put("personalDetails", requestData.getPersonal_details().getFormFields());
-			fieldMaps.put("postalAddress", requestData.getPostal_address().getFormFields());
-//			fieldMaps.put("bankDetails", requestData.getBank_details().getFormFields());
-			
-//			fieldMaps.put("address", requestData.getAddress().getFormFields());
-//			fieldMaps.put("relationHistory", requestData.getRelation_History().getFormFields());
-//			fieldMaps.put("customer", requestData.getCustomer().getFormFields());
-//			fieldMaps.put("moreInfo", requestData.getMore_info().getFormFields());
-//			fieldMaps.put("contactDetails", requestData.getContact_details().getFormFields());
-//			fieldMaps.put("taxInfo", requestData.getTax_info().getFormFields());
-//			fieldMaps.put("staticDetails",requestData.getStaticDetails().getFormFields());
-//			fieldMaps.put("branch", requestData.getBranch().getFormFields());
-//			fieldMaps.put("currency", requestData.getCurrency().getFormFields());
-//			fieldMaps.put("corporateDetails", requestData.getCorporate_details().getFormFields());
-//			fieldMaps.put("employerInformation",requestData.getEmployer_information().getFormFields());
-			// Set fields
+			fieldMaps.put("permanent_address", requestData.getPermanent_address().getFormFields());
+			fieldMaps.put("current_address", requestData.getCurrent_address().getFormFields());
+
 			for (Map.Entry<String, Map<String, String>> entry : fieldMaps.entrySet()) {
 				setUserFields(user, entry.getValue());
 			}
 
 			// Save or update user to database
 			try {
+//				user.setCustCode("SD"+""+user.getCustCode());
 				user.setCust_frz_flag("N");
-				user.setCust_ml_name("d");
-				user.setCust_ml_short_name("d");
-				user.setCust_national_id("f");
-				user.setCust_name("ll");
+				user.setCust_ml_name("DS");
+				user.setCust_ml_short_name("D");
+				user.setCust_national_id("AF");
+				user.setCust_name(user.getCUST_FIRST_NAME()+""+user.getCUST_MIDDLE_NAME()+""+user.getCUST_SUR_NAME());
 				user.setCust_short_name("WE");
 				LM_CUSTOMER savedUser = cmrepo.save(user);
 				response.put(statusCode, successCode);
