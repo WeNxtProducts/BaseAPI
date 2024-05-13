@@ -28,6 +28,8 @@ import org.springframework.stereotype.Service;
 import com.wenxt.base.commonUtils.CommonDao;
 import com.wenxt.base.commonUtils.LM_CUSTOMER;
 import com.wenxt.base.dto.CustomerRequestDto;
+import com.wenxt.base.model.LM_CUST_CURR;
+import com.wenxt.base.model.lm_cust_divn;
 
 @Service
 public class CustomerMasterServiceImpl implements CustomerMasterService {
@@ -59,6 +61,12 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
 
 	@Value("${spring.warning.code}")
 	private String warningCode;
+	
+	@Autowired
+	private CustomerDivnRepo custDivnRepo;
+	
+	@Autowired
+	private CustomerCurrencyRepo custCurrRepo;
 
 	@Override
 	public String getAllCustomlist() throws JSONException, SQLException {
@@ -155,7 +163,7 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
 		JSONObject data = new JSONObject();
 
 		try {
-			String custCode = requestData.getFrontForm().getFormFields().get("CUST_CODE");
+			String custCode = requestData.getFrontForm().getFormFields().get("cust_code");
 			Optional<LM_CUSTOMER> optionalUser = cmrepo.findByCustCode(custCode);
 			LM_CUSTOMER user = optionalUser.orElse(new LM_CUSTOMER());
 
@@ -171,6 +179,7 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
 			// Save or update user to database
 			try {
 //				user.setCustCode("SD"+""+user.getCustCode());
+				user.setCustCode(custCode);
 				user.setCust_frz_flag("N");
 				user.setCust_ml_name("DS");
 				user.setCust_ml_short_name("D");
@@ -246,6 +255,83 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
 		} catch (NoSuchFieldException e) {
 			// Field not found, continue to the next field
 		}
+	}
+
+	@Override
+	public String addBranch(lm_cust_divn customerDivn) {
+		JSONObject response = new JSONObject();
+		try {
+			lm_cust_divn savedDivn = custDivnRepo.save(customerDivn);
+			if(savedDivn.getCDIV_ID() > 0) {
+				response.put(statusCode, successCode);
+				response.put(messageCode, "Division Details Saved Successfully");
+			}else {
+				response.put(statusCode, errorCode);
+			}
+		}catch(Exception e) {
+			response.put(statusCode, errorCode);
+			response.put(messageCode, e.getMessage());
+		}
+		return response.toString();	
+	}
+
+	@Override
+	public String updateBranch(lm_cust_divn customerDivn) {
+		JSONObject response = new JSONObject();
+		lm_cust_divn existingDetails = custDivnRepo.getById(customerDivn.getCDIV_ID());
+		if(existingDetails != null) {
+			existingDetails.setCDIV_DIVN_CODE(customerDivn.getCDIV_DIVN_CODE());
+			existingDetails.setCDIV_CUST_CODE(customerDivn.getCDIV_CUST_CODE());
+			existingDetails.setCDIV_FRZ_FLAG(customerDivn.getCDIV_FRZ_FLAG());
+			try {
+			custDivnRepo.save(existingDetails);
+			response.put(statusCode, successCode);
+			response.put(messageCode, "Division Details Updated Successfully");
+			}catch(Exception e){
+				response.put(statusCode, errorCode);
+				response.put(messageCode, e.getMessage());
+			}
+			
+		}
+		return response.toString();
+	}
+
+	@Override
+	public String addCurrency(LM_CUST_CURR customerCurrency) {
+		JSONObject response = new JSONObject();
+		try {
+			LM_CUST_CURR savedDivn = custCurrRepo.save(customerCurrency);
+			if(savedDivn.getCCUR_ID() > 0) {
+				response.put(statusCode, successCode);
+				response.put(messageCode, "Division Details Saved Successfully");
+			}else {
+				response.put(statusCode, errorCode);
+			}
+		}catch(Exception e) {
+			response.put(statusCode, errorCode);
+			response.put(messageCode, e.getMessage());
+		}
+		return response.toString();	
+	}
+
+	@Override
+	public String updateCurrency(LM_CUST_CURR customerCurrency) {
+		JSONObject response = new JSONObject();
+		LM_CUST_CURR existingDetails = custCurrRepo.getById(customerCurrency.getCCUR_ID());
+		if(existingDetails != null) {
+			existingDetails.setCCUR_CUST_CODE(customerCurrency.getCCUR_CUST_CODE());
+			existingDetails.setCCUR_CURR_CODE(customerCurrency.getCCUR_CURR_CODE());
+			try {
+			custCurrRepo.save(existingDetails);
+			response.put(statusCode, successCode);
+			response.put(messageCode, "Division Details Updated Successfully");
+			}catch(Exception e){
+				response.put(statusCode, errorCode);
+				response.put(messageCode, e.getMessage());
+			}
+			
+		}
+		return response.toString();
 	}
 
 }

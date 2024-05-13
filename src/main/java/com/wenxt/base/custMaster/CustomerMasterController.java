@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wenxt.base.dto.CustomerRequestDto;
+import com.wenxt.base.model.LM_CUST_CURR;
+import com.wenxt.base.model.lm_cust_divn;
 
 @RestController
 @RequestMapping("/customer")
@@ -41,7 +43,24 @@ public class CustomerMasterController {
 		return custom.deleteUserById(custCode);
 	}
 	
+	@PostMapping("/addBranch")
+	public String addBranch(@RequestBody lm_cust_divn customerDivn) {
+		return custom.addBranch(customerDivn);
+	}
 	
+	@PostMapping("/updateBranch")
+	public String updateBranch(@RequestBody lm_cust_divn customerDivn) {
+		return custom.updateBranch(customerDivn);
+	}
 
+	@PostMapping("/addCurrency")
+	public String addCurrency(@RequestBody LM_CUST_CURR customerCurrency) {
+		return custom.addCurrency(customerCurrency);
+	}
+	
+	@PostMapping("/updateCurrency")
+	public String updateCurrency(@RequestBody LM_CUST_CURR customerCurrency) {
+		return custom.updateCurrency(customerCurrency);
+	}
 
 }
