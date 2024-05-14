@@ -334,4 +334,38 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
 		return response.toString();
 	}
 
+	@Override
+	public String deleteBranch(Integer iD) {
+		JSONObject response = new JSONObject();
+		lm_cust_divn existingDetails = custDivnRepo.getById(iD);
+		if(existingDetails != null) {
+			try {
+			custDivnRepo.deleteById(existingDetails.getCDIV_ID());
+			response.put(statusCode, successCode);
+			response.put(messageCode, "Division Details Updated Successfully");
+			}catch(Exception e){
+				response.put(statusCode, errorCode);
+				response.put(messageCode, e.getMessage());
+			}	
+			}
+		return response.toString();
+	}
+
+	@Override
+	public String deleteCurrency(Integer iD) {
+		JSONObject response = new JSONObject();
+		LM_CUST_CURR existingDetails = custCurrRepo.getById(iD);
+		if(existingDetails != null) {
+			try {
+			custCurrRepo.deleteById(existingDetails.getCCUR_ID());
+			response.put(statusCode, successCode);
+			response.put(messageCode, "Division Details Updated Successfully");
+			}catch(Exception e){
+				response.put(statusCode, errorCode);
+				response.put(messageCode, e.getMessage());
+			}	
+			}
+		return response.toString();
+	}
+
 }

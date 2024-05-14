@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wenxt.base.dto.CustomerRequestDto;
@@ -61,6 +62,16 @@ public class CustomerMasterController {
 	@PostMapping("/updateCurrency")
 	public String updateCurrency(@RequestBody LM_CUST_CURR customerCurrency) {
 		return custom.updateCurrency(customerCurrency);
+	}
+	
+	@PostMapping("/deleteBranch")
+	public String deleteBranch(@RequestParam Integer ID) {
+		return custom.deleteBranch(ID);
+	}
+	
+	@PostMapping("/deleteCurrency")
+	public String deleteCurrency(@RequestParam Integer ID) {
+		return custom.deleteCurrency(ID);
 	}
 
 }

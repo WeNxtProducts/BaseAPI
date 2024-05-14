@@ -18,7 +18,7 @@ public class lm_cust_divn
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "CDIV_ID")
-	@JsonProperty("divisionId")
+	@JsonProperty("ID")
 	private Integer _CDIV_ID;
 	public Integer getCDIV_ID()
 	{
@@ -42,7 +42,7 @@ public class lm_cust_divn
 	}
 
 	@Column(name = "CDIV_DIVN_CODE")
-	@JsonProperty("divisionCode")
+	@JsonProperty("CDIV_DIVN_CODE")
 	private String _CDIV_DIVN_CODE;
 	public String getCDIV_DIVN_CODE()
 	{

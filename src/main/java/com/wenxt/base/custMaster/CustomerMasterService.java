@@ -26,4 +26,8 @@ public interface CustomerMasterService {
 
 	String updateCurrency(LM_CUST_CURR customerCurrency);
 
+	String deleteBranch(Integer iD);
+
+	String deleteCurrency(Integer iD);
+
 }

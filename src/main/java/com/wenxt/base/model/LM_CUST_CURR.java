@@ -18,7 +18,7 @@ public class LM_CUST_CURR
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "CCUR_ID")
-	@JsonProperty("currencyID")
+	@JsonProperty("ID")
 	private Integer _CCUR_ID;
 	public Integer getCCUR_ID()
 	{
@@ -42,7 +42,7 @@ public class LM_CUST_CURR
 	}
 
 	@Column(name = "CCUR_CURR_CODE")
-	@JsonProperty("currencyCode")
+	@JsonProperty("CCUR_CURR_CODE")
 	private String _CCUR_CURR_CODE;
 	public String getCCUR_CURR_CODE()
 	{

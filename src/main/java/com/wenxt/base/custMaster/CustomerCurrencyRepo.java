@@ -7,5 +7,7 @@ import com.wenxt.base.model.LM_CUST_CURR;
 
 @Repository
 public interface CustomerCurrencyRepo extends JpaRepository<LM_CUST_CURR, Integer> {
+	
+	void deleteById(Integer id);
 
 }
