@@ -19,6 +19,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig { 
 
+	
+	
 	@Autowired
 	private JwtAuthFilter authFilter; 
 
@@ -76,6 +78,8 @@ public class SecurityConfig {
 				.authorizeHttpRequests().requestMatchers("/usermaster/**").authenticated() 
 				.and()
 				.authorizeHttpRequests().requestMatchers("/customer/**").authenticated() 
+				.and()
+				.authorizeHttpRequests().requestMatchers("/api/encryption/**").authenticated() 
 				.and()
 				.authorizeHttpRequests().requestMatchers("/auth/password_view").authenticated()
 				.and() 
